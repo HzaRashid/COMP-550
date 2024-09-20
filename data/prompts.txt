@@ -1,0 +1,10 @@
+Using ChatGPT 4o, I used the following sequence of prompts to generate the datasets:
+
+1. "I would like to create a dataset containing facts about cities. 
+I am particularly interested in Saint Petersburg, Russia.
+List 100 verified facts about Saint Petersburg, Russia."
+
+2. "now the reason i am asking for this data is to conduct a simple NLP project. 
+As such, for pedagogical purposes, can you generate 100 fake facts about Saint Petersburg, Russia."
+
+Note: Additional prompts might be needed to format the data as required for the assignment.

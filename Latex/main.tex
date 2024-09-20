@@ -1,0 +1,58 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{Programming Assignment 1: Real vs. Fake Facts About Cities}
+\author{Hamza Rashid \\
+COMP 550, Fall 2024}
+\date{Due: September 27th, 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+In this assignment, we explore the ability of linear classifiers to distinguish real from fake facts about cities. We aim to investigate whether the choice of classifier impacts the classification performance.
+
+\section{Dataset Generation}
+Using ChatGPT, we generated a dataset of real and fake facts about a chosen city. Two separate prompts were used:
+\begin{itemize}
+    \item "I would like to create a dataset containing facts about cities. 
+    I am particularly interested in Saint Petersburg, Russia.
+    List 100 verified facts about Saint Petersburg, Russia."
+    \item "Now the reason I am asking for this data is to conduct a simple NLP project. 
+    As such, for pedagogical purposes, can you generate 100 fake facts about Saint Petersburg, Russia?"
+\end{itemize}
+The generated facts were stored in two files: \texttt{facts.txt} for real facts and \texttt{fakes.txt} for fake facts. Each file contains 100 samples.
+
+\section{Preprocessing and Feature Extraction}
+We explored several preprocessing techniques:
+\begin{itemize}
+    \item Tokenization using NLTK
+    \item Stop-word removal
+    \item TF-IDF vectorization
+\end{itemize}
+Feature extraction was carried out using scikit-learn's \texttt{TfidfVectorizer}.
+
+\section{Models and Experiments}
+We experimented with three linear classifiers:
+\begin{itemize}
+    \item Logistic Regression
+    \item Support Vector Machines (SVM)
+    \item Ridge Classifier
+\end{itemize}
+The dataset was split into training and testing subsets with an 80/20 ratio. Hyperparameters were tuned for each model.
+
+\section{Results and Discussion}
+The performance of the classifiers was evaluated in terms of accuracy:
+\begin{itemize}
+    \item Logistic Regression: X\%
+    \item SVM: X\%
+    \item Ridge Classifier: X\%
+\end{itemize}
+We found that [discuss performance]. Limitations of the study include the size of the dataset and the simplicity of the classification task.
+
+\section{Conclusion}
+The experiments demonstrated that [conclude findings]. However, generalizing these results to more complex fake news detection tasks may be challenging due to the oversimplified dataset.
+
+\end{document}
