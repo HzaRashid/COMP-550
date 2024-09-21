@@ -29,8 +29,9 @@ print(data.tail()) # should be 0 along 'is_fact'
 
 ''' 
 Preprocessing Decisions:
-- Convert text to lowercase, 
-- Remove all non-alphanumeric and non-whitespace characters
-- Tokenize (unigram)
-- Term frequency feature vector
+    - Convert text to lowercase, 
+    - Remove all non-alphanumeric 
+    and non-whitespace characters
+    - Tokenize (unigram)
+    - Term frequency feature vector
 '''
