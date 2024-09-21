@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-''' PREPROCESS DATA 
+''' PREPROCESS DATA
 Column 0: 'text'    (string)
 Column 1: 'is_fact' (boolean)
 '''
