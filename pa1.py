@@ -1,8 +1,15 @@
 ''' IMPORT '''
 import nltk
-import sklearn
+# # uncomment upon first exec:
+# nltk.download('punkt', download_dir="./venv/lib/nltk_data")
+# nltk.download('punkt_tab', download_dir="./venv/lib/nltk_data")
+# #
+from nltk.tokenize import word_tokenize
+
+from sklearn.feature_extraction.text import TfidfTransformer
 import numpy as np
 import pandas as pd
+import re
 
 
 ''' PREPROCESS DATA
@@ -11,12 +18,12 @@ Column 1: 'is_fact' (boolean)
 '''
 
 # FACTS
-fact_data = pd.read_csv('./data/facts.txt', sep='\t')
+fact_data = pd.read_csv('./data/facts.txt', sep='\t', names=['text'])
 fact_data['is_fact'] = 1
 print(fact_data.head()) # verify
 
 # FAKES
-fake_data = pd.read_csv('./data/fakes.txt', sep='\t')
+fake_data = pd.read_csv('./data/fakes.txt', sep='\t', names=['text'])
 fake_data['is_fact'] = 0
 print(fake_data.head()) # verify
 
@@ -29,9 +36,26 @@ print(data.tail()) # should be 0 along 'is_fact'
 
 ''' 
 Preprocessing Decisions:
-    - Convert text to lowercase, 
-    - Remove all non-alphanumeric 
-    and non-whitespace characters
-    - Tokenize (unigram)
-    - Term frequency feature vector
+    1. Convert text to lowercase, 
+    2. Remove all but alphanumeric 
+       & whitespace characters
+    3. Tokenize (unigram)
+    4. Term frequency feature vector
 '''
+
+''' 
+To lowercase:
+    data['text'] = data['text'].apply(lambda s: s.lower())
+
+Remove all but alphanumeric/whitespace chars:
+    data['text'] = data['text'].apply(lambda s: ''.join(re.findall("[a-zA-Z0-9 ]", s)))
+
+Tokenize: 
+    data['text'] = data['text'].apply(lambda s: word_tokenize(s))
+'''
+
+''' All together: '''
+data['text'] = data['text'].apply(
+    lambda s: word_tokenize(''.join(re.findall("[a-zA-Z0-9 ]", s.lower())))
+    )
+
