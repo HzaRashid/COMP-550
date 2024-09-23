@@ -11,7 +11,6 @@ import nltk
 # # download ntlk pos tagger:
 # nltk.download('averaged_perceptron_tagger_eng', download_dir="./venv/lib/nltk_data")
 # #
-
 from nltk.stem import WordNetLemmatizer, PorterStemmer 
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
@@ -19,20 +18,10 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-
-
 import numpy as np
 import pandas as pd
 import re
-''' usage 
-print(WordNetLemmatizer().lemmatize('fairness'))
-print(PorterStemmer().stem('fairness'))
-# use tokenizer instead if punctuation included
-print(pos_tag("this is a sentence".split()))
-'''
 
-
-# print(PorterStemmer().stem('fairness'))
 
 ''' PREPROCESS DATA:
 Column 0: 'text'    (string)
@@ -63,7 +52,9 @@ Preprocessing Decisions:
        & whitespace characters
     3. Tokenize (unigram)
     4. Lemmatize
-    5. Term frequency feature vector
+    5. Stem
+    6. POS tagging
+    7. Term frequency feature vector
 
 To lowercase:
     data['text'] = data['text'].apply(lambda s: s.lower())
@@ -88,16 +79,14 @@ Lemmatize:
 
 ''' All together: 
     - tokenization done implicitly (by re.findall),
-      necessary for lemmatization.
+      necessary for lemmatization/stemming/pos_tagging.
     - feature extraction will also
       require tokens - sci-kit learn handles it.
 '''
 
-lemmatize = WordNetLemmatizer().lemmatize
+
 data['text'] = data['text'].apply(
-    lambda s: ''.join([
-        lemmatize(w) for w in re.findall("[a-zA-Z0-9 ]", s.lower())
-        ])
+    lambda s: ''.join(re.findall("[a-zA-Z0-9 ]", s.lower())) 
     )
 # # verify results
 # print(data.head())
@@ -122,33 +111,54 @@ vectorizer = TfidfVectorizer() # Term Frequency
       of words in the entire dataset.
     - the 'is_fact' column is the true label.
 '''
-X = vectorizer.fit_transform(data['text']) # inputs
-y = data['is_fact'] # labels
 
-# # dataset's text corpus
-# print(vectorizer.get_feature_names_out())
-# # given by: (dataset row length, dataset text corpus size)
-# print(X.shape)
+lemmatize = WordNetLemmatizer().lemmatize
+stem = PorterStemmer().stem
+
+(X_lemmatize, X_stem, X_pos) = (
+    vectorizer.fit_transform(
+        data['text'].apply(
+            lambda s: ' '.join([lemmatize(w) for w in s.split()])
+            )
+    ),
+    vectorizer.fit_transform(
+        data['text'].apply(
+            lambda s: ' '.join([stem(w) for w in s.split()])
+            )
+        ),
+    vectorizer.fit_transform(
+        data['text'].apply(
+            lambda s: ' '.join(['_'.join(t) for t in pos_tag(s.split())])
+            )
+        )
+)
 
 ''' Train-test split:
     - train 80% of data, test on rest.
     - shuffle data before hand.
 '''
+for X, name in (
+    (X_lemmatize, 'LEMMATIZE'), 
+    (X_stem, 'STEM'), 
+    (X_pos, 'POS')
+    ):
+    print(f'{"="*20} Testing {name}... {"="*20}')
+    y = data['is_fact'] # labels
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, 
+        test_size=0.2,
+        random_state=42, 
+        shuffle=True
+        )
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, 
-    test_size=0.2,
-    random_state=42, 
-    shuffle=True
-    )
+    ''' APPLY LINEAR CLASSIFIERS:
+    '''
 
-''' APPLY LINEAR CLASSIFIERS:
-'''
-
-''' Support Vector Machine
-'''
-for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
-    print(f"SVM with {kernel} kernel:")
-    svm_clf = SVC(kernel=kernel)
-    svm_clf.fit(X_train, y_train)
-    print(f'\tMean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
+    ''' 
+    Support Vector Machine
+    '''
+    for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
+        print(f"SVM with {kernel} kernel:")
+        svm_clf = SVC(kernel=kernel)
+        svm_clf.fit(X_train, y_train)
+        print(f'\tMean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
