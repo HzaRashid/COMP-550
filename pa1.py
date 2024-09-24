@@ -167,7 +167,7 @@ for X, name in (
     svm_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
 
-    
+
     ''' Naive Bayes
         - Multinomial implementation
         - default configuration uses laplace smoothing
@@ -177,12 +177,14 @@ for X, name in (
     nb_clf.fit(X, y)
     print(f'-> Mean Accuracy: {nb_clf.score(X_test, y_test) * 100}%')
 
+
     ''' Logistic Regression
     '''
     print(f"\nLogistic Regression:")
     logr_clf = LogisticRegression() 
     logr_clf.fit(X, y)
     print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
+
 
     ''' Linear Regression
     '''
