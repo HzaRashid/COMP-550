@@ -15,9 +15,21 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
 from nltk.stem import WordNetLemmatizer, PorterStemmer 
 from nltk.tag import pos_tag
+from nltk.corpus import wordnet
 import pandas as pd
 import re
 
+
+def get_wordnet_pos(treebank_tag):
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN # default pos used by WordNetLemmatizer
+    
 
 ''' PREPROCESS DATA:
 Column 0: 'text'    (string)
@@ -98,7 +110,7 @@ data['text'] = data['text'].apply(
       that has already been done.
 '''
 
-vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
+vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
 
 ''' feature extraction step:
     - map each row of 'text' column
@@ -106,9 +118,12 @@ vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
       where the corpus is the set
       of words in the entire dataset.
     - the 'is_fact' column is the true label.
-    - n-gram range of 1-3 words is chosen,
-      as city names and that of historical 
-      events/sites typically vary between 1-3 words.
+    - n-gram range of 1-2 words is chosen,
+      as city names, and names of historical 
+      events/sites typically vary between 1-3 words,
+      though 3 is far less common and not worth the
+      additional computational cost.
+
     - The chosen vectorizer also downscales
       tokens that occur in many documents,
       which can help prevent the models
@@ -121,22 +136,21 @@ vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
 lemmatize = WordNetLemmatizer().lemmatize
 stem = PorterStemmer().stem
 
-(X_lemmatize, X_stem, X_pos) = (
+(X_stem, X_lemmatize, X_pos_lemmatize) = (
     vectorizer.fit_transform(
         data['text'].apply(
             lambda s: ' '.join([lemmatize(w) for w in s.split()])
-            )
-    ),
+            )),
+
     vectorizer.fit_transform(
         data['text'].apply(
             lambda s: ' '.join([stem(w) for w in s.split()])
-            )
-        ),
+            )),
+
     vectorizer.fit_transform(
         data['text'].apply(
-            lambda s: ' '.join(['_'.join(t) for t in pos_tag(s.split())])
-            )
-        )
+            lambda s: ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
+            ))
 )
 
 ''' Train-test split:
@@ -144,9 +158,9 @@ stem = PorterStemmer().stem
     - shuffle data before hand.
 '''
 for X, name in (
-    (X_lemmatize, 'LEMMATIZE'), 
-    (X_stem, 'STEM'), 
-    (X_pos, 'POS')
+    (X_stem, 'STEM'),
+    (X_lemmatize, 'LEMMATIZE (Plain)'), 
+    (X_pos_lemmatize, 'LEMMATIZE (With POS tags)')
     ):
     print(f'{"="*20} Testing {name}... {"="*20}')
     y = data['is_fact'] # labels
@@ -180,17 +194,17 @@ for X, name in (
     print(f'-> Mean Accuracy: {nb_clf.score(X_test, y_test) * 100}%')
 
 
-    ''' Logistic Regression
-    '''
-    print(f"\nLogistic Regression:")
-    logr_clf = LogisticRegression() 
-    logr_clf.fit(X, y)
-    print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
-
-
     ''' Linear Regression
     '''
     print(f"\nLinear Regression:")
     linr_clf = LinearRegression() 
     linr_clf.fit(X, y)
     print(f'-> R^2: {linr_clf.score(X_test, y_test) * 100}%')
+    
+
+    ''' Logistic Regression
+    '''
+    print(f"\nLogistic Regression:")
+    logr_clf = LogisticRegression() 
+    logr_clf.fit(X, y)
+    print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
