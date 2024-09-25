@@ -107,13 +107,15 @@ vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
       of words in the entire dataset.
     - the 'is_fact' column is the true label.
     - n-gram range of 1-3 words is chosen,
-      as a city name typically varies between
-      1-3 words.
+      as city names and that of historical 
+      events/sites typically vary between 1-3 words.
     - The chosen vectorizer also downscales
       tokens that occur in many documents,
-      which can help normalize the data
+      which can help prevent the models
+      from giving too much weight to 
+      city names, offering normalization
       when working with multiple cities, and 
-      thus handle outliers more effectively.
+      thus handling outliers more effectively.
 '''
 
 lemmatize = WordNetLemmatizer().lemmatize
