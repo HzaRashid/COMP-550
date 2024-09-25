@@ -166,20 +166,43 @@ for X, name in (
     y = data['is_fact'] # labels
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, 
-        test_size=0.6,
+        test_size=0.20,
         random_state=42, 
         shuffle=True
         )
+    X_train, X_valid, y_train, y_valid = train_test_split(
+        X_train, y_train, 
+        test_size=20/80,
+        shuffle=False
+        )
+    
 
     ''' 
     APPLY LINEAR CLASSIFIERS:
+        - Support Vector Machine 
+        - Naive Bayes
+        - Linear Regression
+        - Logistic Regression
     '''
 
     ''' Support Vector Machine 
         - linear kernel
     '''
-    print(f"SVM (linear kernel):")
-    svm_clf = SVC(kernel='linear')
+
+    ''' Validation 
+    '''
+    # regularization parameter: inversely proportional to regularization
+    print(f"Validating SVM (linear kernel, optimize regularization parameter):")
+    for reg_val in (1.0, 0.5, 0.25):
+        print(f"C={reg_val}:")
+        svm_clf = SVC(kernel='linear', C=reg_val)
+        svm_clf.fit(X_train, y_train)
+        print(f'-> Mean Accuracy: {svm_clf.score(X_valid, y_valid) * 100}%')
+
+    ''' Test
+    '''
+    print(f"\nTesting SVM (linear kernel, C=0.5):")
+    svm_clf = SVC(kernel='linear', C=0.5)
     svm_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
 
@@ -188,23 +211,28 @@ for X, name in (
         - Multinomial implementation
         - default configuration uses laplace smoothing
     '''
-    print(f"\nNaive Bayes (Multinomial):")
-    nb_clf = MultinomialNB() 
-    nb_clf.fit(X, y)
-    print(f'-> Mean Accuracy: {nb_clf.score(X_test, y_test) * 100}%')
 
-
-    ''' Linear Regression
+    ''' Validation 
     '''
-    print(f"\nLinear Regression:")
-    linr_clf = LinearRegression() 
-    linr_clf.fit(X, y)
-    print(f'-> R^2: {linr_clf.score(X_test, y_test) * 100}%')
+    print(f"\nValidating Naive Bayes (Multinomial, optimize smoothing parameter")
+    # smoothing parameter, compare Laplace with Lidstone
+    for alpha in (1.0, 0.5, 0.25):
+        print(f"alpha={alpha}:")
+        nb_clf = MultinomialNB(alpha=alpha) 
+        nb_clf.fit(X_train, y_train)
+        print(f'-> Mean Accuracy: {nb_clf.score(X_valid, y_valid) * 100}%')
+
+    ''' Test
+    '''
+    print(f"\nTesting Naive Bayes (Multinomial, alpha=?):")
+    nb_clf = MultinomialNB() 
+    nb_clf.fit(X_train, y_train)
+    print(f'-> Mean Accuracy: {nb_clf.score(X_test, y_test) * 100}%')
     
 
     ''' Logistic Regression
     '''
     print(f"\nLogistic Regression:")
     logr_clf = LogisticRegression() 
-    logr_clf.fit(X, y)
+    logr_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
