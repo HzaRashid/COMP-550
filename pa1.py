@@ -139,12 +139,12 @@ stem = PorterStemmer().stem
 (X_stem, X_lemmatize, X_pos_lemmatize) = (
     vectorizer.fit_transform(
         data['text'].apply(
-            lambda s: ' '.join([lemmatize(w) for w in s.split()])
+            lambda s: ' '.join([stem(w) for w in s.split()])
             )),
-
+            
     vectorizer.fit_transform(
         data['text'].apply(
-            lambda s: ' '.join([stem(w) for w in s.split()])
+            lambda s: ' '.join([lemmatize(w) for w in s.split()])
             )),
 
     vectorizer.fit_transform(
