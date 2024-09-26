@@ -16,6 +16,7 @@ from sklearn.svm import SVC
 from nltk.stem import WordNetLemmatizer, PorterStemmer 
 from nltk.tag import pos_tag
 from nltk.corpus import wordnet
+import numpy as np
 import pandas as pd
 import re
 
@@ -136,46 +137,80 @@ vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
 lemmatize = WordNetLemmatizer().lemmatize
 stem = PorterStemmer().stem
 
-(X_stem, X_lemmatize, X_pos_lemmatize) = (
-    vectorizer.fit_transform(
-        data['text'].apply(
-            lambda s: ' '.join([stem(w) for w in s.split()])
-            )),
+# (X_stem, X_lemmatize, X_pos_lemmatize) = (
+#     vectorizer.fit_transform(
+#         data['text'].apply(
+#             lambda s: ' '.join([stem(w) for w in s.split()])
+#             )),
             
-    vectorizer.fit_transform(
-        data['text'].apply(
-            lambda s: ' '.join([lemmatize(w) for w in s.split()])
-            )),
+#     vectorizer.fit_transform(
+#         data['text'].apply(
+#             lambda s: ' '.join([lemmatize(w) for w in s.split()])
+#             )),
 
-    vectorizer.fit_transform(
-        data['text'].apply(
-            lambda s: ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
-            ))
-)
+#     vectorizer.fit_transform(
+#         data['text'].apply(
+#             lambda s: ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
+#             ))
+# )
+
+def lamda_stem(s):
+   return ' '.join([stem(w) for w in s.split()])
+
+def lamda_lemmatize(s):
+    return' '.join([lemmatize(w) for w in s.split()])
+
+def lambda_pos_lemmatize(s):
+    return ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
+
+
+preprocess_methods = (
+    ('STEM', lamda_stem),
+    ('LEMMATIZE (Plain)', lamda_lemmatize),
+    ('LEMMATIZE (With POS tags)', lambda_pos_lemmatize),
+    )
+
+train_ratio = 0.80
+validation_ratio = 0.1
+test_ratio = 0.1
+
+# print( data['text'].apply(
+#             lambda s: lamda_stem(s)
+#             ))
+# print(
+#         pd.DataFrame(data['text'].apply(
+#             lambda s: ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
+#             )).assign(is_fact=data['is_fact'].values).tail()
+# )
 
 ''' Train-test split:
     - train 80% of data, test on rest.
     - shuffle data before hand.
 '''
-for X, name in (
-    (X_stem, 'STEM'),
-    (X_lemmatize, 'LEMMATIZE (Plain)'), 
-    (X_pos_lemmatize, 'LEMMATIZE (With POS tags)')
-    ):
+for name, proc_fn in preprocess_methods:
     print(f'{"="*20} Testing {name}... {"="*20}')
+
+    X = vectorizer.fit_transform(
+        data['text'].apply(proc_fn)
+        )
     y = data['is_fact'] # labels
+
+    # train is now 75% of the entire data set
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, 
-        test_size=0.20,
-        random_state=42, 
-        shuffle=True
-        )
-    X_train, X_valid, y_train, y_valid = train_test_split(
-        X_train, y_train, 
-        test_size=20/80,
-        shuffle=False
+        test_size=(1-train_ratio),
+        shuffle=True,
+        random_state=42
         )
     
+    # test is now 15% of the initial data set
+    # validation is now 15% of the initial data set
+    X_valid, X_test, y_valid, y_test = train_test_split(
+        X_test, y_test, 
+        test_size=(test_ratio/(test_ratio + validation_ratio)),
+        shuffle=True,
+        random_state=42
+        )
 
     ''' 
     APPLY LINEAR CLASSIFIERS:
