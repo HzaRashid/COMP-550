@@ -137,28 +137,13 @@ vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
 lemmatize = WordNetLemmatizer().lemmatize
 stem = PorterStemmer().stem
 
-# (X_stem, X_lemmatize, X_pos_lemmatize) = (
-#     vectorizer.fit_transform(
-#         data['text'].apply(
-#             lambda s: ' '.join([stem(w) for w in s.split()])
-#             )),
-            
-#     vectorizer.fit_transform(
-#         data['text'].apply(
-#             lambda s: ' '.join([lemmatize(w) for w in s.split()])
-#             )),
-
-#     vectorizer.fit_transform(
-#         data['text'].apply(
-#             lambda s: ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
-#             ))
-# )
-
 def lamda_stem(s):
    return ' '.join([stem(w) for w in s.split()])
 
+
 def lamda_lemmatize(s):
     return' '.join([lemmatize(w) for w in s.split()])
+
 
 def lambda_pos_lemmatize(s):
     return ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
@@ -174,17 +159,9 @@ train_ratio = 0.80
 validation_ratio = 0.1
 test_ratio = 0.1
 
-# print( data['text'].apply(
-#             lambda s: lamda_stem(s)
-#             ))
-# print(
-#         pd.DataFrame(data['text'].apply(
-#             lambda s: ' '.join([lemmatize(w, get_wordnet_pos(pos)) for w,pos in pos_tag(s.split())])
-#             )).assign(is_fact=data['is_fact'].values).tail()
-# )
 
 ''' Train-test split:
-    - train 80% of data, test on rest.
+    - train 80% of data, validate/test on rest.
     - shuffle data before hand.
 '''
 for name, proc_fn in preprocess_methods:
@@ -216,7 +193,6 @@ for name, proc_fn in preprocess_methods:
     APPLY LINEAR CLASSIFIERS:
         - Support Vector Machine 
         - Naive Bayes
-        - Linear Regression
         - Logistic Regression
     '''
 
