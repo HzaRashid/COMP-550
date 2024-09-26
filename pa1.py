@@ -198,6 +198,8 @@ for name, proc_fn in preprocess_methods:
 
     ''' Support Vector Machine 
         - linear kernel
+        - validate training to optimize the
+          regularization parameter
     '''
 
     ''' Validation 
@@ -235,15 +237,30 @@ for name, proc_fn in preprocess_methods:
 
     ''' Test
     '''
-    print(f"\nTesting Naive Bayes (Multinomial, alpha=?):")
-    nb_clf = MultinomialNB() 
+    print(f"\nTesting Naive Bayes (Multinomial, alpha=0.5):")
+    nb_clf = MultinomialNB(alpha=0.5) 
     nb_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {nb_clf.score(X_test, y_test) * 100}%')
     
 
     ''' Logistic Regression
+        - validate training to optimize the
+          regularization parameter
     '''
-    print(f"\nLogistic Regression:")
+
+    ''' Validation 
+    '''
+    # regularization parameter: inversely proportional to regularization
+    print(f"\nValidating Logistic Regression (optimize regularization parameter):")
+    for reg_val in (1.0, 0.5, 0.25):
+        print(f"C={reg_val}:")
+        logr_clf = LogisticRegression(C=reg_val)
+        logr_clf.fit(X_train, y_train)
+        print(f'-> Mean Accuracy: {svm_clf.score(X_valid, y_valid) * 100}%')
+
+    ''' Test
+    '''
+    print(f"\nTesting Logistic Regression:")
     logr_clf = LogisticRegression() 
     logr_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
