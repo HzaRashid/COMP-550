@@ -28,12 +28,12 @@ Column 1: 'is_fact' (boolean)
 '''
 
 # FACTS
-fact_data = pd.read_csv('./data/test_facts.txt', sep='\t', names=['text'])
+fact_data = pd.read_csv('./data/facts.txt', sep='\t', names=['text'])
 fact_data['is_fact'] = 1
 # print(fact_data.head()) # verify
 
 # FAKES
-fake_data = pd.read_csv('./data/test_fakes.txt', sep='\t', names=['text'])
+fake_data = pd.read_csv('./data/fakes.txt', sep='\t', names=['text'])
 fake_data['is_fact'] = 0
 # print(fake_data.head()) # verify
 
@@ -184,7 +184,6 @@ for name, proc_fn in preprocess_methods:
     svm_clf = SVC(kernel='linear', C=0.5)
     svm_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
-
 
     ''' Naive Bayes
         - Multinomial implementation
