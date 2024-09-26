@@ -89,8 +89,10 @@ vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
 lemmatize = WordNetLemmatizer().lemmatize
 stem = PorterStemmer().stem
 
-# given treeback pos tag
-# return wordnet pos tag to improve wordnet lemmatizer
+''' 
+given treeback pos tag
+return wordnet pos tag
+'''
 def get_wordnet_pos(treebank_tag):
     if treebank_tag.startswith('J'):
         return wordnet.ADJ
@@ -132,15 +134,12 @@ test_ratio = 0.3
 for name, proc_fn in preprocess_methods:
     print(f'{"="*20} {name}... {"="*20}')
 
-    # X_pre  = data['text'].apply(proc_fn)
-    # print(X_pre.head())
-
     X = vectorizer.fit_transform(
         data['text'].apply(proc_fn)
         )
     y = data['is_fact'] # labels
 
-    # train is now 75% of the entire data set
+    # train test split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, 
         test_size=(1-train_ratio),
@@ -148,8 +147,7 @@ for name, proc_fn in preprocess_methods:
         random_state=42
         )
     
-    # test is now 15% of the initial data set
-    # validation is now 15% of the initial data set
+    # split test further to get validation set
     X_valid, X_test, y_valid, y_test = train_test_split(
         X_test, y_test, 
         test_size=(test_ratio/(test_ratio + validation_ratio)),

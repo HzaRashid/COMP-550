@@ -5,7 +5,7 @@
 \geometry{margin=1in}
 
 \title{Programming Assignment 1: Real vs. Fake Facts About Cities}
-\author{Your Name \\
+\author{Hamza Rashid \\
 COMP 550, Fall 2024}
 \date{Due: September 27th, 2024}
 
@@ -16,7 +16,7 @@ COMP 550, Fall 2024}
 \section{Problem Setup}
 The aim of this assignment is to test the efficacy of linear classifiers
 in distinguishing real from fake facts about cities, and determine if the choice
-of classifier is non-trivial. In particular, we evaulate the performance 
+of classifier is non-trivial. In particular, we evaluate the performance 
 of a Linear Support Vector Machine, Multinomial Naive Bayes Classifier, 
 Logistic Regression model, and Linear Regression model. Lastly, we build a training pipeline
 to evaluate the performance of these classifiers under different preprocessing 
@@ -27,7 +27,7 @@ techniques.
 % two classes, but struggle when patterns frequently overlap.
 
 \section{Dataset Generation and Procedure}
-Using an online AI tool, ChatGPT, we generated real and fake facts about Saint Petersburg, Russia. Two prompts were used:
+Using an online AI tool, ChatGPT, we generated real and fake facts about Saint Petersburg, Russia. Three prompts were used:
 \begin{itemize}
     \item "I would like to create a dataset containing facts about cities. 
     I am particularly interested in Saint Petersburg, Russia.
@@ -40,12 +40,12 @@ We created two files: \texttt{facts.txt} (real facts)
 and \texttt{fakes.txt} (fake facts), each containing 2,750 samples, 
 uniformly distributed across 11 cities. The dataset was divided into 
 training, validation, and testing sets
-with a 60/10/30 split. We utilize sklearn's relative term frequency
-vectorizer (tfidf), supplemented with inverse document frequency 
+with a 60/10/30 split. We utilized sklearn's relative term frequency
+vectorizer (\texttt{tfidf}), supplemented with inverse document frequency 
 (penalizing words that appear in many documents), 
-and detecting unigrams, bigrams, and trigrams (city names, and names of historical 
+and enabled to detect unigrams, bigrams, and trigrams (city names, and names of historical 
 events tend to be split into 1-3 words). We created a data processing pipeline
-that culminates in the use of three major preprocessing techniques
+that culminated in the use of three major preprocessing techniques
 tested separately on the classifiers: 
 Porter stemmer, 
 Lemmatization (NLTK, WordNet database), 
@@ -78,15 +78,28 @@ and after supplementing \texttt{NLTK's WordNet Lemmatizer}
 with the Part of Speech tagger \texttt{pos\_tag}
 (as the Lemmatizer would be more accurate). The relatively 
 poor $R^2$ score of $86.7\%$ from the linear regression classifier
-may be attributed to the fact that the feature vector for a 
-given text does vary linearly across the two classes 
+may be attributed to the fact that a feature vector tends to join
+a cluster of other data points in its class
 (for example, catergorizing someone as short or tall can 
-be modelled accurately by a linear classifier). On the other hand,
+be modelled more accurately by a linear regression model). On the other hand,
 the similarity in accuracy, in the neighbourhood of $98\%$, accross the 
 SVM, Naive Bayes Classifier, and Logistic Regression model may be attributed
-to the clustering of data points (feature vectors) in each category.
+to such clustering of classes. 
+The choice of linear classifier is important, depending
+on whether the problem we aim to model is continuous or discrete, and if
+the data points are clustered or linearly distributed according to some input. 
 
 \section{Limitations and Generalization}
-The primary limitation of this study is the simplicity of the dataset, as distinguishing real vs. fake city facts does not capture the complexity of real-world misinformation detection. Additionally, we assumed that all generated facts were clearly factual or fake, which may not be true for all samples. This limits the generalizability of the results to broader contexts.
+The primary limitation of this study is the simplicity of the dataset.
+The \texttt{fake} documents use a particular set of adjectives 
+frequently (e.g., 'secret', 'underground', 'rumored')
+that do not appear as much in the counterpart class, and
+tend to be shorter in length than \texttt{fact} documents.
+As a result, the classes tend to form seperate clusters of feature vectors,
+explaining the high accuracy of all the classifiers we tested. However,
+fake facts can utilize the prominent patterns
+of a real fact, only to make a claim that can be proved 
+false only with prior knowledge on the given subject – often the case when working with real-world data.
+Therefore, we cannot generalize the results of this study to the real world.
 
 \end{document}
