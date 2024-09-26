@@ -1,9 +1,11 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{geometry}
+\geometry{margin=1in}
 
 \title{Programming Assignment 1: Real vs. Fake Facts About Cities}
-\author{Hamza Rashid \\
+\author{Your Name \\
 COMP 550, Fall 2024}
 \date{Due: September 27th, 2024}
 
@@ -11,48 +13,80 @@ COMP 550, Fall 2024}
 
 \maketitle
 
-\section{Introduction}
-In this assignment, we explore the ability of linear classifiers to distinguish real from fake facts about cities. We aim to investigate whether the choice of classifier impacts the classification performance.
+\section{Problem Setup}
+The aim of this assignment is to test the efficacy of linear classifiers
+in distinguishing real from fake facts about cities, and determine if the choice
+of classifier is non-trivial. In particular, we evaulate the performance 
+of a Linear Support Vector Machine, Multinomial Naive Bayes Classifier, 
+Logistic Regression model, and Linear Regression model. Lastly, we build a training pipeline
+to evaluate the performance of these classifiers under different preprocessing 
+techniques.
 
-\section{Dataset Generation}
-Using ChatGPT, we generated a dataset of real and fake facts about a chosen city. Two separate prompts were used:
+% We hypothesize that linear models can adequately perform this task
+% given an simple dataset with non-overlapping patterns between the 
+% two classes, but struggle when patterns frequently overlap.
+
+\section{Dataset Generation and Procedure}
+Using an online AI tool, ChatGPT, we generated real and fake facts about Saint Petersburg, Russia. Two prompts were used:
 \begin{itemize}
     \item "I would like to create a dataset containing facts about cities. 
     I am particularly interested in Saint Petersburg, Russia.
     List 100 verified facts about Saint Petersburg, Russia."
-    \item "Now the reason I am asking for this data is to conduct a simple NLP project. 
-    As such, for pedagogical purposes, can you generate 100 fake facts about Saint Petersburg, Russia?"
+    \item "now the reason i am asking for this data is to conduct a simple NLP project. 
+    As such, for pedagogical purposes, can you generate 100 fake facts about Saint Petersburg, Russia."
+    \item (to match the uniform distribution of data provided by another student) "Give me 150 more real and fake facts"
 \end{itemize}
-The generated facts were stored in two files: \texttt{facts.txt} for real facts and \texttt{fakes.txt} for fake facts. Each file contains 100 samples.
+We created two files: \texttt{facts.txt} (real facts) 
+and \texttt{fakes.txt} (fake facts), each containing 2,750 samples, 
+uniformly distributed across 11 cities. The dataset was divided into 
+training, validation, and testing sets
+with a 60/10/30 split. We utilize sklearn's relative term frequency
+vectorizer (tfidf), supplemented with inverse document frequency 
+(penalizing words that appear in many documents), 
+and detecting unigrams, bigrams, and trigrams (city names, and names of historical 
+events tend to be split into 1-3 words). We created a data processing pipeline
+that culminates in the use of three major preprocessing techniques
+tested separately on the classifiers: 
+Porter stemmer, 
+Lemmatization (NLTK, WordNet database), 
+and supplementing the WordNet Lemmatizer 
+with Part of Speech tagging 
+to improve its accuracy.
+Minor preprocessing decisions applied 
+to each of the aforementioned techniques
+included: converting text to lowercase and
+removing all but alphanumeric and whitespace characters.
 
-\section{Preprocessing and Feature Extraction}
-We explored several preprocessing techniques:
-\begin{itemize}
-    \item Tokenization using NLTK
-    \item Stop-word removal
-    \item TF-IDF vectorization
-\end{itemize}
-Feature extraction was carried out using scikit-learn's \texttt{TfidfVectorizer}.
+\section{Parameter Settings and Models}
+We experimented with four linear classifiers: Linear Support Vector Machine, Multinomial Naive Bayes Classifier, 
+Logistic Regression model, and Linear Regression model. We tested the regularization 
+hyperparameter (inversely proportional to regularization strength) 
+for the SVM and Logistic model with values in the range \texttt{0.25, 0.5, 1.0}, 
+getting mixed results across the three major preprocessing techniques. 
+As for the Naive Bayes classifier, we compared laplace smoothing with varying degrees of Lidstone smoothing,
+testing values in the range \texttt{{0.25, 0.5, 1.0}} for the smoothing parameter.
+No hyperparameter testing was performed for the linear regression classifier.
 
-\section{Models and Experiments}
-We experimented with three linear classifiers:
-\begin{itemize}
-    \item Logistic Regression
-    \item Support Vector Machines (SVM)
-    \item Ridge Classifier
-\end{itemize}
-The dataset was split into training and testing subsets with an 80/20 ratio. Hyperparameters were tuned for each model.
+\section{Results and Conclusions}
+All but the Linear Regression method
+performed similarly across all three hyperparameter settings 
+and major preprocessing methods. 
+One would expect improvement in accuracy going from 
+Porter Stemmer to Lemmatization 
+(as it is context-sensitive),
+and after supplementing \texttt{NLTK's WordNet Lemmatizer} 
+with the Part of Speech tagger \texttt{pos\_tag}
+(as the Lemmatizer would be more accurate). The relatively 
+poor $R^2$ score of $86.7\%$ from the linear regression classifier
+may be attributed to the fact that the feature vector for a 
+given text does vary linearly across the two classes 
+(for example, catergorizing someone as short or tall can 
+be modelled accurately by a linear classifier). On the other hand,
+the similarity in accuracy, in the neighbourhood of $98\%$, accross the 
+SVM, Naive Bayes Classifier, and Logistic Regression model may be attributed
+to the clustering of data points (feature vectors) in each category.
 
-\section{Results and Discussion}
-The performance of the classifiers was evaluated in terms of accuracy:
-\begin{itemize}
-    \item Logistic Regression: X\%
-    \item SVM: X\%
-    \item Ridge Classifier: X\%
-\end{itemize}
-We found that [discuss performance]. Limitations of the study include the size of the dataset and the simplicity of the classification task.
-
-\section{Conclusion}
-The experiments demonstrated that [conclude findings]. However, generalizing these results to more complex fake news detection tasks may be challenging due to the oversimplified dataset.
+\section{Limitations and Generalization}
+The primary limitation of this study is the simplicity of the dataset, as distinguishing real vs. fake city facts does not capture the complexity of real-world misinformation detection. Additionally, we assumed that all generated facts were clearly factual or fake, which may not be true for all samples. This limits the generalizability of the results to broader contexts.
 
 \end{document}

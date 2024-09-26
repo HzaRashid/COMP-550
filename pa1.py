@@ -71,11 +71,9 @@ data['text'] = data['text'].apply(
 
     - the 'is_fact' column is the true label.
 
-    - n-gram range of 1-2 words is chosen,
+    - n-gram range of 1-3 words is chosen,
       as city names, and names of historical 
-      events/sites typically vary between 1-3 words,
-      though 3 is far less common and not worth the
-      additional computational cost.
+      events/sites typically vary between 1-3 words.
 
     - The chosen vectorizer also downscales
       tokens that occur in many documents,
@@ -86,7 +84,7 @@ data['text'] = data['text'].apply(
       thus handling outliers more effectively.
 '''
 
-vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
+vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
 
 lemmatize = WordNetLemmatizer().lemmatize
 stem = PorterStemmer().stem
@@ -234,3 +232,11 @@ for name, proc_fn in preprocess_methods:
     logr_clf = LogisticRegression() 
     logr_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
+
+
+    ''' Linear Regression
+    '''
+    print(f"\nLinear Regression:")
+    linr_clf = LinearRegression() 
+    linr_clf.fit(X_train, y_train)
+    print(f'-> R^2: {linr_clf.score(X_test, y_test) * 100}%')
