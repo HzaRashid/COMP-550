@@ -1,6 +1,6 @@
 ''' IMPORT '''
-import nltk
 # # download ntlk tokenizer, lemmatizer, & pos tagger:
+# import nltk
 # nltk.download('punkt', download_dir="./venv/lib/nltk_data")
 # nltk.download('punkt_tab', download_dir="./venv/lib/nltk_data")
 # nltk.download('wordnet', download_dir="./venv/lib/nltk_data")
@@ -20,16 +20,6 @@ import numpy as np
 import pandas as pd
 import re
 
-
-def get_wordnet_pos(treebank_tag):
-    if treebank_tag.startswith('J'):
-        return wordnet.ADJ
-    elif treebank_tag.startswith('V'):
-        return wordnet.VERB
-    elif treebank_tag.startswith('R'):
-        return wordnet.ADV
-    else:
-        return wordnet.NOUN # default pos used by WordNetLemmatizer
     
 
 ''' PREPROCESS DATA:
@@ -38,12 +28,12 @@ Column 1: 'is_fact' (boolean)
 '''
 
 # FACTS
-fact_data = pd.read_csv('./data/facts.txt', sep='\t', names=['text'])
+fact_data = pd.read_csv('./data/test_facts.txt', sep='\t', names=['text'])
 fact_data['is_fact'] = 1
 # print(fact_data.head()) # verify
 
 # FAKES
-fake_data = pd.read_csv('./data/fakes.txt', sep='\t', names=['text'])
+fake_data = pd.read_csv('./data/test_fakes.txt', sep='\t', names=['text'])
 fake_data['is_fact'] = 0
 # print(fake_data.head()) # verify
 
@@ -64,35 +54,7 @@ Preprocessing Decisions:
     5. Stem
     6. POS tagging
     7. Term frequency feature vector
-
-To lowercase:
-    data['text'] = data['text'].apply(lambda s: s.lower())
-
-Remove all but alphanumeric/whitespace chars:
-    data['text'] = data['text'].apply(
-        lambda s: ''.join(re.findall("[a-zA-Z0-9 ]", s)) 
-        ) # re.findall preserves wspace
-
-Tokenize: 
-    # from nltk.tokenize import word_tokenize
-    data['text'] = data['text'].apply(
-        lambda s: ' '.join(word_tokenize(s))
-        ) # word_tokenize removes wspace
-
-Lemmatize:
-    # lemmatize = WordNetLemmatizer().lemmatize
-    data['text'] = data['text'].apply(
-        lambda s: ' '.join([lemmatize(w) for w in s.split()])
-        ) # split removes wspace
 '''
-
-''' All together: 
-    - tokenization done implicitly (by re.findall),
-      necessary for lemmatization/stemming/pos_tagging.
-    - feature extraction will also
-      require tokens - sci-kit learn handles it.
-'''
-
 
 data['text'] = data['text'].apply(
     lambda s: ''.join(re.findall("[a-zA-Z0-9 ]", s.lower())) 
@@ -101,24 +63,14 @@ data['text'] = data['text'].apply(
 # print(data.head())
 # print(data.tail())
 
-
-''' Feature extraction comments:
-    - preprocessing thus far
-      smooths out t.f. distribution;
-      all lowercase, no punctuation, etc.
-    - sklearn's feature extraction methods
-      can also perform some of the preprocessing
-      that has already been done.
-'''
-
-vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
-
-''' feature extraction step:
+''' Feature extraction step:
     - map each row of 'text' column
       to its relative term frequency feature vector,
       where the corpus is the set
       of words in the entire dataset.
+
     - the 'is_fact' column is the true label.
+
     - n-gram range of 1-2 words is chosen,
       as city names, and names of historical 
       events/sites typically vary between 1-3 words,
@@ -134,8 +86,23 @@ vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
       thus handling outliers more effectively.
 '''
 
+vectorizer = TfidfVectorizer(ngram_range=(1,2)) # Term Frequency
+
 lemmatize = WordNetLemmatizer().lemmatize
 stem = PorterStemmer().stem
+
+# given treeback pos tag
+# return wordnet pos tag to improve wordnet lemmatizer
+def get_wordnet_pos(treebank_tag):
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN # default pos used by WordNetLemmatizer
+    
 
 def lamda_stem(s):
    return ' '.join([stem(w) for w in s.split()])
@@ -155,17 +122,20 @@ preprocess_methods = (
     ('LEMMATIZE (With POS tags)', lambda_pos_lemmatize),
     )
 
-train_ratio = 0.80
+train_ratio = 0.6
 validation_ratio = 0.1
-test_ratio = 0.1
+test_ratio = 0.3
 
 
 ''' Train-test split:
-    - train 80% of data, validate/test on rest.
+    - train 60% of data, validate on 10%, test on rest.
     - shuffle data before hand.
 '''
 for name, proc_fn in preprocess_methods:
-    print(f'{"="*20} Testing {name}... {"="*20}')
+    print(f'{"="*20} {name}... {"="*20}')
+
+    # X_pre  = data['text'].apply(proc_fn)
+    # print(X_pre.head())
 
     X = vectorizer.fit_transform(
         data['text'].apply(proc_fn)
@@ -256,11 +226,11 @@ for name, proc_fn in preprocess_methods:
         print(f"C={reg_val}:")
         logr_clf = LogisticRegression(C=reg_val)
         logr_clf.fit(X_train, y_train)
-        print(f'-> Mean Accuracy: {svm_clf.score(X_valid, y_valid) * 100}%')
+        print(f'-> Mean Accuracy: {logr_clf.score(X_valid, y_valid) * 100}%')
 
     ''' Test
     '''
-    print(f"\nTesting Logistic Regression:")
+    print(f"\nTesting Logistic Regression (C=1.0):")
     logr_clf = LogisticRegression() 
     logr_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
