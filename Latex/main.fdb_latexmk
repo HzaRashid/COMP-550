@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1727387830.57799 "/Users/hamzarashid/Desktop/comp550/Latex/main.tex" "main.pdf" "main" 1727387830.95374 0
-  "/Users/hamzarashid/Desktop/comp550/Latex/main.tex" 1727387830.35671 5449 aea5a79dc70ec7438118014cd9fcf76a ""
+["pdflatex"] 1727389432.36255 "/Users/hamzarashid/Desktop/comp550/Latex/main.tex" "main.pdf" "main" 1727389432.78086 0
+  "/Users/hamzarashid/Desktop/comp550/Latex/main.tex" 1727389432.09668 5670 17ef70398d8d799056d76a77efcd89be ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -46,8 +46,8 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1726687478 5498206 6c0f03cb370063b7ddbd563e5f9ce23a ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1726687597 3326097 67d158ddf1124cb5acae0cccb2750d58 ""
   "/usr/local/texlive/2024/texmf.cnf" 1726687468.2814 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "main.aux" 1727387830.91346 599 27c0c7d924dd8b43cf3f8ed4b1a2fca9 "pdflatex"
-  "main.tex" 1727387830.35671 5449 aea5a79dc70ec7438118014cd9fcf76a ""
+  "main.aux" 1727389432.73926 599 27c0c7d924dd8b43cf3f8ed4b1a2fca9 "pdflatex"
+  "main.tex" 1727389432.09668 5670 17ef70398d8d799056d76a77efcd89be ""
   (generated)
   "main.aux"
   "main.log"

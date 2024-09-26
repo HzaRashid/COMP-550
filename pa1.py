@@ -227,7 +227,7 @@ for name, proc_fn in preprocess_methods:
     ''' Test
     '''
     print(f"\nTesting Logistic Regression (C=1.0):")
-    logr_clf = LogisticRegression() 
+    logr_clf = LogisticRegression(C=1.0) 
     logr_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
 
