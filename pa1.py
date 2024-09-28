@@ -149,7 +149,7 @@ for name, proc_fn in preprocess_methods:
         random_state=42
         )
     
-    
+
     ''' 
     Linear Support Vector Machine:
     '''

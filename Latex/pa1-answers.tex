@@ -60,7 +60,7 @@ Logistic Regression model,
 and Linear Regression model. Due to the 
 simplicity of our dataset, we tested hyperparameters
 that address overfitting and
-how the models generally behave with unseen.
+how the models behave with unseen data.
 We tested the inverse-regularization parameter
 for the SVM and Logistic model with values $\{\texttt{0.25, 0.5, 1.0}\}$.
 As for the Naive Bayes classifier, 
@@ -71,31 +71,31 @@ No hyperparameter testing was performed for the linear regression classifier.
 We also explored several train, validation, test split ratios.
 
 \subsection*{IV. Results and Conclusions}
-The preprocessing methods methods, Porter-Stemmer, 
+The preprocessing methods, Porter-Stemmer, 
 Lemmatization, and POS-supplemented Lemmatization
 yielded a similar number of features: 
 \texttt{40,951}, \texttt{41,986}, \texttt{41,227}, respectively.
 And, while the Logistic model performed best with \texttt{C:=1.0} independently of
 the preprocessing method, we obtained mixed results with the SVM;
 \texttt{C:=0.5} was favorable under Porter-Stemmer and Lemmatization,
-while the POS-supplemented lemmatizer caused a little bit more overfitting,
+while the POS-supplemented Lemmatizer caused little bit more overfitting,
 requiring \texttt{C:=0.25} for optimal performance. The overfitting might 
-a result of the POS-supplemented lemmatizer generating the most features
-out of the three methods, causing an adverse affect in the SVM.
+be a result of the POS-supplemented Lemmatizer generating the most features
+out of the three methods, causing an adverse effect in the SVM.
 As for the smoothing parameter, 
 we did not find any noticeable differences across the tested values, 
 which was expected given the simplicity of the dataset, even split of the classes,
-independence assumption making the Naive Bayes classifier less prone 
+and the independence assumption making the Naive Bayes classifier less prone 
 to overfitting.
 The relatively poor $R^2$ score of  \texttt{$\sim$ 80\%} from the linear regression classifier
 may be attributed to a feature vector's tendency to join
 a cluster of other data points in its class, due to the 
 simplicity of our dataset.
 On the other hand,
-the high accuracy scores, in the neighbourhood of \texttt{98\%}, across the 
+the high accuracy scores, in the neighborhood of \texttt{98\%}, across the 
 SVM, Naive Bayes Classifier, and Logistic Regression model may be attributed
 to such clustering of classes, and similar number of features. 
-Thus, the choice of linear classifier is non-trivial, as its 
+Thus, the choice of linear classifier is not trivial, as its 
 performance depends on the distribution of the feature vectors and classes (in a discrete problem).
 
 
@@ -106,7 +106,7 @@ frequently (e.g., 'secret', 'underground', 'rumored')
 that do not appear as much in the counterpart class, and
 tend to be shorter in length than \texttt{fact} documents.
 As a result, the classes are easily distinguishable with linear models,
-as they tend to form seperable clusters of feature vectors in a low dimensional space. However,
+as they tend to form separable clusters of feature vectors in a low dimensional space. However,
 fake facts can utilize the prominent patterns
 of a real fact to make a claim that can only be proved 
 false with prior knowledge on the given subject – often the case when working with real-world data.
@@ -117,7 +117,7 @@ information that occurs in a real-world setting.
 Therefore, we cannot generalize the results of this
 study to the real world; 
 the overall problem of distinguishing real from fake
-facts is not necessarly simple enough to be modelled by
+facts is not necessarily simple enough to be modelled by
 a linear classifier.
 
 \end{document}
