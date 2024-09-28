@@ -13,21 +13,18 @@ COMP 550, Fall 2024}
 
 \maketitle
 
-\section{Problem Setup}
-The aim of this assignment is to test the efficacy of linear classifiers
+\subsection*{I. Problem Setup}
+The aim of this assignment is to test the effectiveness of linear classifiers
 in distinguishing real from fake facts about cities, and determine if the choice
-of classifier is non-trivial. In particular, we evaluate the performance 
+of classifier is non-trivial. We evaluate the performance 
 of a Linear Support Vector Machine, Multinomial Naive Bayes Classifier, 
-Logistic Regression model, and Linear Regression model. Lastly, we build a training pipeline
+Logistic Regression model, and Linear Regression model, and build a training pipeline
 to evaluate the performance of these classifiers under different preprocessing 
 techniques.
 
-% We hypothesize that linear models can adequately perform this task
-% given an simple dataset with non-overlapping patterns between the 
-% two classes, but struggle when patterns frequently overlap.
 
-\section{Dataset Generation and Procedure}
-Using an online AI tool, ChatGPT, we generated real and fake facts about Saint Petersburg, Russia. Three prompts were used:
+\subsection*{II. Dataset Generation and Procedure}
+Using ChatGPT, we generated real and fake facts about Saint Petersburg, Russia. Three prompts were used:
 \begin{itemize}
     \item "I would like to create a dataset containing facts about cities. 
     I am particularly interested in Saint Petersburg, Russia.
@@ -40,13 +37,11 @@ We created two files: \texttt{facts.txt} (real facts)
 and \texttt{fakes.txt} (fake facts), each containing 2,750 samples, 
 uniformly distributed across 11 cities. The dataset was divided into 
 training, validation, and testing sets
-with a 70/10/20 split. We utilized sklearn's relative term frequency
-vectorizer (\texttt{tfidf}), with inverse document frequency 
-(penalizing words that appear in many documents), 
-and enabled to detect unigrams, bigrams, and trigrams (city names, and names of historical 
-events tend to be split into 1-3 words). We created a data processing pipeline
-that culminated in the use of three major preprocessing techniques
-tested separately on the classifiers: 
+with a 70/10/20 split. We utilized sklearn's relative term frequency (with inverse document frequency)
+vectorizer (\texttt{tfidf}), 
+enabled to detect unigrams, bigrams, and trigrams (city names, and names of historical 
+events tend to be split into 1-3 words). Three major preprocessing techniques explored
+and tested separately on the classifiers were: 
 Porter-Stemmer, 
 Lemmatization (NLTK, WordNet database), 
 and supplementing the WordNet Lemmatizer 
@@ -57,14 +52,15 @@ to each of the aforementioned techniques
 included: converting text to lowercase, and
 removing all but alphanumeric and whitespace characters.
 
-\section{Parameter Settings and Models}
+\subsection*{III. Parameter Settings and Models}
 We experimented with four linear classifiers: 
 Linear Support Vector Machine, 
 Multinomial Naive Bayes Classifier, 
 Logistic Regression model, 
 and Linear Regression model. Due to the 
-simplicity of our dataset, we tested the parameters
-that address overfitting.
+simplicity of our dataset, we tested hyperparameters
+that address overfitting and
+how the models generally behave with unseen.
 We tested the inverse-regularization parameter
 for the SVM and Logistic model with values $\{\texttt{0.25, 0.5, 1.0}\}$.
 As for the Naive Bayes classifier, 
@@ -72,64 +68,52 @@ we compared Laplace smoothing
 with varying degrees of Lidstone smoothing,
 testing values $\{\texttt{0.25, 0.5, 1.0}\}$. 
 No hyperparameter testing was performed for the linear regression classifier.
-We also experimented with various train, validation, test split ratios.
+We also explored several train, validation, test split ratios.
 
-
-\section{Results and Conclusions}
-While the Logistic model performed best with \texttt{C:=1.0} independently of
+\subsection*{IV. Results and Conclusions}
+The preprocessing methods methods, Porter-Stemmer, 
+Lemmatization, and POS-supplemented Lemmatization
+yielded a similar number of features: 
+\texttt{40,951}, \texttt{41,986}, \texttt{41,227}, respectively.
+And, while the Logistic model performed best with \texttt{C:=1.0} independently of
 the preprocessing method, we obtained mixed results with the SVM;
-\texttt{C:=1.0} was favorable under Porter-Stemmer and Lemmatization,
-while the POS-supplemented Lemmatizer caused a little bit more overfitting,
-with \texttt{C:=0.5} being the optimal setting. 
-As for the smoothing parameter in the Naive Bayes classifier, 
-we did not find any noticeable differences across the tested values.
-However, these results were obtained under the 70/10/20 split, 
-and while it is expected, it is important to note that 
-the optimal parameter settings and overall model performance 
-also depend on how the dataset split.
-
-All but the Linear Regression classifier
-performed similarly across the major preprocessing methods 
-and hyperparameter settings.
-% One would expect improvement in accuracy going from 
-% Porter-Stemmer to Lemmatization 
-% (as it is context-sensitive),
-% and after supplementing \texttt{NLTK's WordNet Lemmatizer} 
-% with the Part of Speech tagger \texttt{pos\_tag}
-% (as the Lemmatizer would be more accurate). 
-The relatively 
-poor $R^2$ score of  \texttt{$\sim$ 86\%} from the linear regression classifier
+\texttt{C:=0.5} was favorable under Porter-Stemmer and Lemmatization,
+while the POS-supplemented lemmatizer caused a little bit more overfitting,
+requiring \texttt{C:=0.25} for optimal performance. The overfitting might 
+a result of the POS-supplemented lemmatizer generating the most features
+out of the three methods, causing an adverse affect in the SVM.
+As for the smoothing parameter, 
+we did not find any noticeable differences across the tested values, 
+which was expected given the simplicity of the dataset, even split of the classes,
+independence assumption making the Naive Bayes classifier less prone 
+to overfitting.
+The relatively poor $R^2$ score of  \texttt{$\sim$ 80\%} from the linear regression classifier
 may be attributed to a feature vector's tendency to join
 a cluster of other data points in its class, due to the 
 simplicity of our dataset.
-% (for example, catergorizing someone as short or tall can 
-% be modelled more accurately by a linear regression model).
 On the other hand,
 the high accuracy scores, in the neighbourhood of \texttt{98\%}, across the 
 SVM, Naive Bayes Classifier, and Logistic Regression model may be attributed
-to such clustering of classes. 
-Thus, the choice of linear classifier is non-trivial, as its
-performance depends
-on whether the data points are clustered 
-or linearly distributed according to some input,
-and if the prediction space is continuous or discrete.
+to such clustering of classes, and similar number of features. 
+Thus, the choice of linear classifier is non-trivial, as its 
+performance depends on the distribution of the feature vectors and classes (in a discrete problem).
 
 
-\section{Limitations and Generalization}
+\subsection*{V. Limitations and Generalization}
 The primary limitation of this study is the simplicity of the dataset.
 The \texttt{fake} documents use a particular set of words 
 frequently (e.g., 'secret', 'underground', 'rumored')
 that do not appear as much in the counterpart class, and
 tend to be shorter in length than \texttt{fact} documents.
-As a result, the classes tend to form seperate clusters of feature vectors,
-explaining the high accuracy of all the classifiers we tested. However,
+As a result, the classes are easily distinguishable with linear models,
+as they tend to form seperable clusters of feature vectors in a low dimensional space. However,
 fake facts can utilize the prominent patterns
 of a real fact to make a claim that can only be proved 
 false with prior knowledge on the given subject – often the case when working with real-world data.
 Therefore, while it was reasonable to assume that ChatGPT would provide real facts,
 it was not reasonable to assume that the generated 
-fake facts would be representative of the false
-information that occurs in a typical real-world dataset. 
+fake facts would be representative of false
+information that occurs in a real-world setting. 
 Therefore, we cannot generalize the results of this
 study to the real world; 
 the overall problem of distinguishing real from fake
