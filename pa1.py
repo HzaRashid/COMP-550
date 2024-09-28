@@ -41,7 +41,6 @@ data = pd.concat([fact_data, fake_data])
 # # verify
 # print(data.head()) # should be 1 along 'is_fact'
 # print(data.tail()) # should be 0 along 'is_fact'
-# print(data)
 
 
 ''' 
@@ -99,7 +98,7 @@ preprocess_methods = (
     ('LEMMATIZE (With POS tags)', lambda_pos_lemmatize),
     )
 
-# train 70% of data, validate on 10%, test on rest.
+# 70/10/20 train/validate/test split
 train_ratio = 0.7
 validation_ratio = 0.1
 test_ratio = 0.2
@@ -149,8 +148,10 @@ for name, proc_fn in preprocess_methods:
         shuffle=True,
         random_state=42
         )
-
-    ''' Linear Support Vector Machine:
+    
+    
+    ''' 
+    Linear Support Vector Machine:
     '''
 
     ''' Validation:
@@ -174,7 +175,8 @@ for name, proc_fn in preprocess_methods:
     print(f'-> Mean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
 
 
-    ''' Multinomial Naive Bayes:
+    ''' 
+    Multinomial Naive Bayes:
     '''
 
     ''' Validation:
