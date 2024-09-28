@@ -7,7 +7,6 @@
 # nltk.download('averaged_perceptron_tagger_eng', 
 # download_dir="./venv/lib/nltk_data")
 # #
-from sklearn.metrics import accuracy_score, classification_report
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -42,6 +41,7 @@ data = pd.concat([fact_data, fake_data])
 # # verify
 # print(data.head()) # should be 1 along 'is_fact'
 # print(data.tail()) # should be 0 along 'is_fact'
+# print(data)
 
 
 ''' 
@@ -63,32 +63,6 @@ data['text'] = data['text'].apply(
 # print(data.head())
 # print(data.tail())
 
-''' Feature extraction step:
-    - map each row of 'text' column
-      to its relative term frequency feature vector,
-      where the corpus is the set
-      of words in the entire dataset.
-
-    - the 'is_fact' column is the true label.
-
-    - n-gram range of 1-3 words is chosen,
-      as city names, and names of historical 
-      events/sites typically vary between 1-3 words.
-
-    - The chosen vectorizer also downscales
-      tokens that occur in many documents,
-      which can help prevent the models
-      from giving too much weight to 
-      city names, offering normalization
-      when working with multiple cities, and 
-      thus handling outliers more effectively.
-'''
-
-vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
-
-lemmatize = WordNetLemmatizer().lemmatize
-stem = PorterStemmer().stem
-
 ''' 
 given treeback pos tag
 return wordnet pos tag
@@ -103,6 +77,9 @@ def get_wordnet_pos(treebank_tag):
     else:
         return wordnet.NOUN # default pos used by WordNetLemmatizer
     
+
+lemmatize = WordNetLemmatizer().lemmatize
+stem = PorterStemmer().stem
 
 def lamda_stem(s):
    return ' '.join([stem(w) for w in s.split()])
@@ -122,113 +99,127 @@ preprocess_methods = (
     ('LEMMATIZE (With POS tags)', lambda_pos_lemmatize),
     )
 
-train_ratio = 0.6
+# train 70% of data, validate on 10%, test on rest.
+train_ratio = 0.7
 validation_ratio = 0.1
-test_ratio = 0.3
+test_ratio = 0.2
 
+train, valid_and_test = train_test_split(
+    data,
+    test_size=(1-train_ratio),
+    shuffle=True,
+    random_state=42
+)
+# reset indices after shuffle
+train = train.reset_index(drop=True)
+valid_and_test = valid_and_test.reset_index(drop=True)
 
-''' Train-test split:
-    - train 60% of data, validate on 10%, test on rest.
-    - shuffle data before hand.
+''' Test all linear classifiers
+    under all preprocessing methods
+
+    The Classifiers:
+    - Support Vector Machine (linear kernel)
+    - Naive Bayes (Multinomial)
+    - Logistic Regression
+    - Linear Regression
 '''
 for name, proc_fn in preprocess_methods:
     print(f'{"="*20} {name}... {"="*20}')
 
-    X = vectorizer.fit_transform(
-        data['text'].apply(proc_fn)
-        )
-    y = data['is_fact'] # labels
+    vectorizer = TfidfVectorizer(ngram_range=(1,3)) # Term Frequency
 
-    # train test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, 
-        test_size=(1-train_ratio),
-        shuffle=True,
-        random_state=42
-        )
-    
-    # split test further to get validation set
+    X_train, y_train = ( 
+        vectorizer.fit_transform(train['text'].apply(proc_fn)),
+        train['is_fact']
+    ) # fit training corpus and extract feature vectors
+
+    X_valid_and_test, y_valid_and_test = (
+        vectorizer.transform(valid_and_test['text'].apply(proc_fn)),
+        valid_and_test['is_fact']
+    ) # extract feature vectors w.r.t. training fit
+
+    # num features obtained by current proprocessing method
+    print('num features: ', X_train.shape[1], '\n')
+
+    # get validation and test sets
     X_valid, X_test, y_valid, y_test = train_test_split(
-        X_test, y_test, 
+        X_valid_and_test, 
+        y_valid_and_test, 
         test_size=(test_ratio/(test_ratio + validation_ratio)),
         shuffle=True,
         random_state=42
         )
 
-    ''' 
-    APPLY LINEAR CLASSIFIERS:
-        - Support Vector Machine 
-        - Naive Bayes
-        - Logistic Regression
+    ''' Linear Support Vector Machine:
     '''
 
-    ''' Support Vector Machine 
-        - linear kernel
-        - validate training to optimize the
-          regularization parameter
+    ''' Validation:
+        optimize the inverse-regularization parameter
     '''
-
-    ''' Validation 
-    '''
-    # regularization parameter: inversely proportional to regularization
-    print(f"Validating SVM (linear kernel, optimize regularization parameter):")
+    print(f"Validating linear SVM (optimize inverse-regularization parameter):")
+    svm_scores = {}
     for reg_val in (1.0, 0.5, 0.25):
-        print(f"C={reg_val}:")
         svm_clf = SVC(kernel='linear', C=reg_val)
         svm_clf.fit(X_train, y_train)
-        print(f'-> Mean Accuracy: {svm_clf.score(X_valid, y_valid) * 100}%')
+        score = svm_clf.score(X_valid, y_valid)
+        svm_scores[score] = reg_val
+        print(f'C:={reg_val} -> Mean Accuracy: {score * 100}%')
 
     ''' Test
     '''
-    print(f"\nTesting SVM (linear kernel, C=0.5):")
-    svm_clf = SVC(kernel='linear', C=0.5)
+    opt_reg_svm = svm_scores[max(svm_scores)]
+    print(f"\nTesting SVM (linear kernel, C:={opt_reg_svm}):")
+    svm_clf = SVC(kernel='linear', C=opt_reg_svm)
     svm_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {svm_clf.score(X_test, y_test) * 100}%')
 
-    ''' Naive Bayes
-        - Multinomial implementation
-        - default configuration uses laplace smoothing
+
+    ''' Multinomial Naive Bayes:
     '''
 
-    ''' Validation 
+    ''' Validation:
+        optimize smoothing parameter
     '''
-    print(f"\nValidating Naive Bayes (Multinomial, optimize smoothing parameter")
-    # smoothing parameter, compare Laplace with Lidstone
+    print(f"\nValidating Multinomial Naive Bayes (optimize smoothing parameter):")
+    nb_scores = {}
     for alpha in (1.0, 0.5, 0.25):
-        print(f"alpha={alpha}:")
         nb_clf = MultinomialNB(alpha=alpha) 
         nb_clf.fit(X_train, y_train)
-        print(f'-> Mean Accuracy: {nb_clf.score(X_valid, y_valid) * 100}%')
+        score = nb_clf.score(X_valid, y_valid)
+        nb_scores[score] = alpha
+        print(f'alpha:={alpha} -> Mean Accuracy: {score * 100}%')
 
     ''' Test
     '''
-    print(f"\nTesting Naive Bayes (Multinomial, alpha=0.5):")
-    nb_clf = MultinomialNB(alpha=0.5) 
+    opt_alpha = nb_scores[max(nb_scores)]
+    print(f"\nTesting Naive Bayes (Multinomial, alpha:={opt_alpha}):")
+    nb_clf = MultinomialNB(alpha=opt_alpha) 
     nb_clf.fit(X_train, y_train)
     print(f'-> Mean Accuracy: {nb_clf.score(X_test, y_test) * 100}%')
     
 
-    ''' Logistic Regression
-        - validate training to optimize the
-          regularization parameter
+    ''' Logistic Regression:
     '''
 
-    ''' Validation 
+    ''' Validation:
+        optimize inverse-regularization parameter
     '''
-    # regularization parameter: inversely proportional to regularization
-    print(f"\nValidating Logistic Regression (optimize regularization parameter):")
+    print(f"\nValidating Logistic Regression (optimize inverse-regularization parameter):")
+    lgr_scores = {}
     for reg_val in (1.0, 0.5, 0.25):
-        print(f"C={reg_val}:")
-        logr_clf = LogisticRegression(C=reg_val)
-        logr_clf.fit(X_train, y_train)
-        print(f'-> Mean Accuracy: {logr_clf.score(X_valid, y_valid) * 100}%')
+        lgr_clf = LogisticRegression(C=reg_val)
+        lgr_clf.fit(X_train, y_train)
+        score = lgr_clf.score(X_valid, y_valid)
+        lgr_scores[score] = reg_val
+        print(f'C:={reg_val} -> Mean Accuracy: {score * 100}%')
 
     ''' Test
     '''
-    print(f"\nTesting Logistic Regression (C=1.0):")
-    logr_clf = LogisticRegression(C=1.0) 
-    logr_clf.fit(X_train, y_train)
-    print(f'-> Mean Accuracy: {logr_clf.score(X_test, y_test) * 100}%')
+    opt_reg_lgr = lgr_scores[max(lgr_scores)]
+    print(f"\nTesting Logistic Regression (C:={opt_reg_lgr}):")
+    lgr_clf = LogisticRegression(C=opt_reg_lgr) 
+    lgr_clf.fit(X_train, y_train)
+    print(f'-> Mean Accuracy: {lgr_clf.score(X_test, y_test) * 100}%')
 
 
     ''' Linear Regression
@@ -237,3 +228,5 @@ for name, proc_fn in preprocess_methods:
     linr_clf = LinearRegression() 
     linr_clf.fit(X_train, y_train)
     print(f'-> R^2: {linr_clf.score(X_test, y_test) * 100}%')
+
+    print('\n')
