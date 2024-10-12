@@ -101,7 +101,8 @@ and Stochastic Gradient Descent.
 Character-level embeddings helped capture 
 orthographic and morphological features 
 indicating whether a token (or token sequence) 
-represents a name.
+represents a name, as well as retain 
+meaningful data even when dealing with OOV items.
 The authors utilized a Bi-LSTM
 to process each token as a character-sequence,
 with the final embedding given by the concatenation 
@@ -131,7 +132,8 @@ or, deal with \texttt{OOV} items at the hyperparameter-tuning level
 At the time of the paper's
 publication, the use of external gazetteers was common in the 
 task of NER. While it is an effective approach
-both in terms of computational cost and model performance, 
+both in terms of computational cost (lookup table structure) 
+and model performance (provides domain-specific knowledge), 
 relying on such a resource is a symptom
 of the model failing to generalize effectively to the overall
 task of NER, regardless of the domain or language.
@@ -140,9 +142,10 @@ state-of-the-art performance without relying on hand-crafted features and
 domain-specific knowledge. The LSTM-CRF model performed better than
 the chunking model, likely due to the
 context provided by the bidirectional LSTMs.
-However, it is important to note that the
-pretrained word embeddings gave the largest improvement,
-with overall performance of +7.31 in F1 for the LSTM-CRF. 
+However, it is important to note that the 
+pretrained word embeddings gave the largest 
+improvement, increasing the F1 score 
+by +7.31 for the LSTM-CRF.
 Such pretrained embeddings are an external, 
 language specific resource. Thus, while
 the authors made a significant leap
