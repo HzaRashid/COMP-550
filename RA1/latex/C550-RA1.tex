@@ -9,7 +9,7 @@
 \date{}
 \begin{document}
 \maketitle
-\section*{Introduction}
+% \section*{Introduction}
 % - Briefly introduce the paper "Neural Architectures for Named Entity Recognition" by Lample et al. (2016).
 % - State that the paper presents two neural architectures for NER: bidirectional LSTM-CRF and transition-based chunking using stack-LSTMs.
 % - Mention the main objective: developing language-agnostic NER systems without reliance on hand-crafted features or gazetteers.
@@ -22,13 +22,16 @@ Named Entity Recognition (NER) systems on
 hand-crafted  features and domain-specific knowledge, 
 a common approach at the time due to the small, 
 supervised training corpora that was available. 
-The authors proposed two LSTM-based neural 
-architectures designed to generalize without 
-relying on external resources. A key 
-component of their methodology was
+The authors proposed two neural 
+architectures designed to generalize 
+under the limited training corpora: a 
+bidirectional-LSTM encoder pipelining input sequences
+to a CRF layer, and, a greedy, transition-based 
+chunking algorithm utilizing a Stack-LSTM to manage states. 
+A key component of their methodology was
 the formation of character-sensitive word 
 embeddings, to capture orthographical and morphological 
-details. While the proposed models acheive 
+details. While the proposed models acheived
 state-of-the-art performance, some aspects
 of the methodology limit the scope for generalization. 
 We continue in more detail.
@@ -39,28 +42,70 @@ We continue in more detail.
 % - Discuss the use of character-based word representations combined with unsupervised pre-trained embeddings to improve generalization.
 % - Mention the experiments conducted on English, Dutch, German, and Spanish datasets, and their state-of-the-art results.
 
-The proposed neural architectures are: a 
-bidirectional LSTM supplemented with a CRF layer, and,
-a greedy, transition-based chunking algorithm utilizing a Stack-LSTM 
-(supporting stack operations and embeddings for stack objects). 
-The main components of the bidirectional LSTM-CRF architecture,
-as depicted in Figure 1, are: word embeddings, Bi-LSTM encoder, 
-and CRF layer. 
-% The word embeddings are the embeddings 
-% of each token in the input sequence (more on this later).
 The Bi-LSTM encoder consists of a forward and backward 
-LSTM, reading the input sequence from left to right, 
-and right to left, respectively.
+LSTM, reading the input sequence in those orders, respectively.
+The resulting left and right representations are then concatenated
+into a single vector, the word-in-context representation.
 The bi-directional architecture is critical 
 for making informative encodings, 
-as the left or right context alone 
-may not capture the entire context of tokens  
+as the left and right encodings 
+may be insufficient, or capture the wrong \textit{context},
+if considered in isolation
 (homographical richness is an intuitive case). 
+Furthermore, the CRF layer utilizes the formulation
+discussed in class, where the feature sum is taken 
+over the state-transition and observation-emission (given by the Bi-LSTM) scores.
+The linear-chain CRF's ability to capture the bi-directional
+relationships between output labels makes it effective in addressing 
+two problems that are closely related to classification accuracy: 
+the strong dependence between output labels (inherent to the NER task), 
+and, the formal grammar induced by the \texttt{IOBES (Inside, Outside, Beginning, End, Single)}
+tagging scheme utilized by the authors (e.g., \texttt{I-PER} cannot follow \texttt{B-LOC}).
 
 % The forward LSTM captures the context to the left of each word, while the backward 
 % captures the context to the right. The forward and backward context for each token
 % are concatenated to capture the entire context.
 
+describe transition-based chunking model
+
+
+
+%discuss input embedding (and how it handles oov):
+In desigining the input word embeddings, 
+the authors found character-level 
+treatment crucial for identifying 
+orthographic or morphological evidence 
+that something is a name (or
+not a name). This was acheieved by 
+initializing random embeddings 
+for each character, then feeding
+each token as a character sequence into 
+a Bi-LSTM – with the final
+embedding given by the concatenation 
+of the left and right contexts. 
+This embedding is then concatenated
+with pretrained word embeddings
+from a large corpus. During testing, 
+words without an embedding in the
+lookup table are mapped to an \texttt{UNK} 
+embedding, and singletons
+with the \texttt{UNK}  embedding are 
+assigned a probability of $0.5$.
+This approach 
+has been found useful in 
+handling \texttt{OOV} items, as the embedding
+nonetheless captures character-level details.
+This differs from techniques shown in class,
+which deal with \texttt{OOV} items either
+at the token level (\texttt{UNK} mapping, but no character-level embedding),
+or at the hyperparameter-tuning level 
+(e.g., the Naive Bayes smoothing parameter).
+and, embeddings learned from a large corpus 
+that are sensitive to word order. 
+
+
+discuss results (and advantages/disadvantages of using external gazetteers)
+% MENTION DROPOUT!!!!
 
 \section*{Strengths and Limitations}
 The researchers acheived the original task, 
