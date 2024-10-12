@@ -13,26 +13,25 @@
 \maketitle
 
 \vspace{-5ex}
-The paper "Neural Architectures for 
-Named Entity Recognition" by Lample et al. (2016)., 
+The paper  ``Neural Architectures for 
+Named Entity Recognition'' by Lample et al. (2016), 
 addressed the reliance of state-of-the-art 
 Named Entity Recognition (NER) systems on 
 hand-crafted  features and domain-specific knowledge, 
 a common approach at the time due to the small, 
-supervised training corpora that was available. 
+supervised training corpora that were available. 
 The authors proposed two neural 
 architectures designed to generalize 
 under the limited training corpora: a 
 bidirectional-LSTM encoder pipelining input sequences
-to a CRF layer, and, a greedy, transition-based 
+to a CRF layer, and a greedy, transition-based 
 chunking algorithm utilizing a Stack-LSTM to manage states. 
 A key component of their methodology was
 the formation of character-sensitive word 
 embeddings, to capture orthographical and morphological 
-details. While the proposed models acheived
+details. While the proposed models achieved
 state-of-the-art performance, some aspects
 of the methodology limit the scope for generalization. 
-We continue in more detail.
 
 % - Describe the key approaches used:
 %   - Bidirectional LSTM-CRF model.
@@ -41,7 +40,7 @@ We continue in more detail.
 % - Mention the experiments conducted on English, Dutch, German, and Spanish datasets, and their state-of-the-art results.
 
 The Bi-LSTM encoder consists of a forward and backward 
-LSTM, reading the input sequence in those orders, respectively.
+LSTM, reading the input sequence in those orders.
 The resulting left and right representations are then concatenated
 into a single vector, the word-in-context representation.
 The bi-directional architecture is critical 
@@ -67,12 +66,12 @@ tagging scheme utilized by the authors (e.g., \texttt{I-PER} cannot follow \text
 The Transition-Based Chunking architecture
 consists of two stacks (an output 
 and processing stack), 
-a buffer (unprocecessed
+a buffer (unprocessed
 portion of the input sequence), and three
 operators (\texttt{SHIFT}: moves token from
 buffer to stack, \texttt{OUT}: moves token from buffer 
 to output stack, \texttt{REDUCE(y)}: pops all items from
-top of the stack, creating a “chunk”, assigns it label y, 
+top of the stack, creating a “chunk”, assigns it the label \texttt{y}, 
 and pushes an embedding onto the output). 
 The model concatenates embeddings of 
 the stack, buffer, output, 
@@ -93,16 +92,16 @@ the maximum probability operator at each time step.
 In designing a language agnostic approach,
 the authors trained their models on datasets 
 containing English, Spanish, 
-German and Dutch documents. Many aspects
+German, and Dutch documents. Many aspects
 of their methodology deal with generalizability, 
 and preventing overfitting. This is demonstrated 
 in their use of character-level word embeddings, 
 dropout training,
 and Stochastic Gradient Descent.
-Character-level embeddings helped
-in capturing orthographic and 
-morphological evidence that a token 
-(or token-sequence) is a name.
+Character-level embeddings helped capture 
+orthographic and morphological features 
+indicating whether a token (or token sequence) 
+represents a name.
 The authors utilized a Bi-LSTM
 to process each token as a character-sequence,
 with the final embedding given by the concatenation 
@@ -120,10 +119,10 @@ embedding, and such singletons
 are assigned a probability of $0.5$ during training.
 This approach differs from those discussed in
 class, which either identify \texttt{OOV} words seen
-during testing with those that occured
+during testing with those that occurred
 with low frequency during training (e.g., frequency threshold
 to determine \texttt{UNK} mapping), 
-or, deal with \texttt{OOV} items at the the hyperparameter-tuning level 
+or, deal with \texttt{OOV} items at the hyperparameter-tuning level 
 (e.g., the Naive Bayes smoothing parameter).
 
 
@@ -136,7 +135,7 @@ both in terms of computational cost and model performance,
 relying on such a resource is a symptom
 of the model failing to generalize effectively to the overall
 task of NER, regardless of the domain or language.
-The proposed neural architectures acheived
+The proposed neural architectures achieved
 state-of-the-art performance without relying on hand-crafted features and
 domain-specific knowledge. The LSTM-CRF model performed better than
 the chunking model, likely due to the
