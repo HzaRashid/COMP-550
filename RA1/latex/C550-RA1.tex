@@ -4,17 +4,15 @@
 \usepackage{enumitem}
 \usepackage{geometry}
 \geometry{a4paper, margin=0.5in}
-\title{Reading Assignment 1}
-\author{Hamza Rashid \\ COMP 550, Fall 2024}
+\usepackage{titling}
+\setlength{\droptitle}{-3cm}
+\title{ }
+\author{ Reading Assignment 1 \\ Hamza Rashid, 260971031 \\ COMP 550, Fall 2024}
 \date{}
 \begin{document}
 \maketitle
-% \section*{Introduction}
-% - Briefly introduce the paper "Neural Architectures for Named Entity Recognition" by Lample et al. (2016).
-% - State that the paper presents two neural architectures for NER: bidirectional LSTM-CRF and transition-based chunking using stack-LSTMs.
-% - Mention the main objective: developing language-agnostic NER systems without reliance on hand-crafted features or gazetteers.
 
-
+\vspace{-5ex}
 The paper "Neural Architectures for 
 Named Entity Recognition" by Lample et al. (2016)., 
 addressed the reliance of state-of-the-art 
@@ -66,87 +64,95 @@ tagging scheme utilized by the authors (e.g., \texttt{I-PER} cannot follow \text
 % captures the context to the right. The forward and backward context for each token
 % are concatenated to capture the entire context.
 
-describe transition-based chunking model
+The Transition-Based Chunking architecture
+consists of two stacks (an output 
+and processing stack), 
+a buffer (unprocecessed
+portion of the input sequence), and three
+operators (\texttt{SHIFT}: moves token from
+buffer to stack, \texttt{OUT}: moves token from buffer 
+to output stack, \texttt{REDUCE(y)}: pops all items from
+top of the stack, creating a “chunk”, assigns it label y, 
+and pushes an embedding onto the output). 
+The model concatenates embeddings of 
+the stack, buffer, output, 
+and operation history to maintain
+the full algorithm state.
+This embedding is used to define a 
+probability distribution over actions 
+at each time step, and the model is trained 
+to maximize the conditional probability of
+sequences of reference actions 
+(extracted from a labeled training corpus) 
+given the input sentences, greedily choosing
+the maximum probability operator at each time step. 
 
 
 
 %discuss input embedding (and how it handles oov):
-In desigining the input word embeddings, 
-the authors found character-level 
-treatment crucial for identifying 
-orthographic or morphological evidence 
-that something is a name (or
-not a name). This was acheieved by 
-initializing random embeddings 
-for each character, then feeding
-each token as a character sequence into 
-a Bi-LSTM – with the final
-embedding given by the concatenation 
-of the left and right contexts. 
-This embedding is then concatenated
-with pretrained word embeddings
-from a large corpus. During testing, 
+In designing a language agnostic approach,
+the authors trained their models on datasets 
+containing English, Spanish, 
+German and Dutch documents. Many aspects
+of their methodology deal with generalizability, 
+and preventing overfitting. This is demonstrated 
+in their use of character-level word embeddings, 
+dropout training,
+and Stochastic Gradient Descent.
+Character-level embeddings helped
+in capturing orthographic and 
+morphological evidence that a token 
+(or token-sequence) is a name.
+The authors utilized a Bi-LSTM
+to process each token as a character-sequence,
+with the final embedding given by the concatenation 
+of the left and right contexts, which is then 
+concatenated with a pretrained (skip-n-gram) 
+word embedding in a lookup table.
+This combination of embeddings did not enhance 
+performance until it was supplemented with dropout 
+training, and the authors found that the optimal
+setting for this parameter varied across the languages.
+During testing, 
 words without an embedding in the
-lookup table are mapped to an \texttt{UNK} 
-embedding, and singletons
-with the \texttt{UNK}  embedding are 
-assigned a probability of $0.5$.
-This approach 
-has been found useful in 
-handling \texttt{OOV} items, as the embedding
-nonetheless captures character-level details.
-This differs from techniques shown in class,
-which deal with \texttt{OOV} items either
-at the token level (\texttt{UNK} mapping, but no character-level embedding),
-or at the hyperparameter-tuning level 
+lookup table are mapped to an \texttt{UNK}
+embedding, and such singletons
+are assigned a probability of $0.5$ during training.
+This approach differs from those discussed in
+class, which either identify \texttt{OOV} words seen
+during testing with those that occured
+with low frequency during training (e.g., frequency threshold
+to determine \texttt{UNK} mapping), 
+or, deal with \texttt{OOV} items at the the hyperparameter-tuning level 
 (e.g., the Naive Bayes smoothing parameter).
-and, embeddings learned from a large corpus 
-that are sensitive to word order. 
 
 
-discuss results (and advantages/disadvantages of using external gazetteers)
-% MENTION DROPOUT!!!!
 
-\section*{Strengths and Limitations}
-The researchers acheived the original task, 
-- Strengths:
-  - Language-independent, does not rely on hand-crafted features or gazetteers.
-  - Achieves state-of-the-art results in multiple languages.
-  - Effective use of character-based and word embeddings to handle morphology.
-- Limitations:
-  - The transition-based chunking model is more dependent on character-based information compared to the LSTM-CRF.
-  - Greedy action selection in the Stack-LSTM model can lead to suboptimal results.
-  The paper includes a detailed outline
-  of the methodologies, and provides strong 
-  justifications for its preprocessing decisions, 
-  particularly at the input layer (arguing that LSTM's 
-  are an a priori better function class for modeling 
-  the relationship between words and their characters, 
-  as they take into account position-variant features) .
-\section*{Bidirectional LSTM-CRF Architecture (Figure 1)}
-- Describe the key components:
-  - Bidirectional LSTM: Encodes contextual information from both left and right contexts.
-  - Conditional Random Field (CRF): Models dependencies between tags to produce globally optimal sequences.
-- Explain the importance of these components:
-  - Bidirectional LSTM captures comprehensive context for each word.
-  - CRF layer ensures valid and coherent tag sequences.
+% discuss results (and advantages/disadvantages of using external gazetteers)
+At the time of the paper's
+publication, the use of external gazetteers was common in the 
+task of NER. While it is an effective approach
+both in terms of computational cost and model performance, 
+relying on such a resource is a symptom
+of the model failing to generalize effectively to the overall
+task of NER, regardless of the domain or language.
+The proposed neural architectures acheived
+state-of-the-art performance without relying on hand-crafted features and
+domain-specific knowledge. The LSTM-CRF model performed better than
+the chunking model, likely due to the
+context provided by the bidirectional LSTMs.
+However, it is important to note that the
+pretrained word embeddings gave the largest improvement,
+with overall performance of +7.31 in F1 for the LSTM-CRF. 
+Such pretrained embeddings are an external, 
+language specific resource. Thus, while
+the authors made a significant leap
+in developing generalizable models
+for NER, there is still much work to be done
+in developing models that generalize effectively
+without relying on external, hand-crafted resources.
 
-\section*{Handling of OOV Items}
-- Describe how the proposed method addresses out-of-vocabulary (OOV) words:
-  - Uses character-level embeddings generated by a bidirectional LSTM to represent words based on their characters.
-  - Incorporates pre-trained embeddings to handle unseen words by mapping them to a common UNK embedding during training.
-- Compare to class discussions:
-  - Similar to character-level models we discussed, which also leverage character features to address OOV problems.
-  - Pre-trained embeddings are akin to word2vec embeddings we discussed for capturing distributional semantics.
-
-\section*{Use of Gazetteers (Table 1)}
-- Discuss methods incorporating gazetteers to improve NER performance:
-  - Gazetteers can provide explicit, domain-specific named entity information, helping models generalize better.
-  - Advantages: Improves recognition accuracy for specific entity types, especially in low-resource settings.
-  - Disadvantages: Dependence on domain-specific resources reduces language independence and increases cost for new domains or languages.
-
-\section*{Conclusion}
-- Summarize the overall contribution of the paper.
-- Highlight the effectiveness of neural architectures for NER without relying on language-specific features.
+\section*{References}
+- Lample, G., Ballesteros, M., Subramanian, S., Kawakami, K., \& Dyer, C. (2016). Neural Architectures for Named Entity Recognition. In *Proceedings of NAACL-HLT* (pp. 260-270). Association for Computational Linguistics.
 
 \end{document}
