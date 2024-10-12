@@ -3,9 +3,9 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{geometry}
-\geometry{a4paper, margin=1in}
-\title{Reading Assignment 1: COMP 550, Fall 2024}
-\author{Hamza Rashid}
+\geometry{a4paper, margin=0.5in}
+\title{Reading Assignment 1}
+\author{Hamza Rashid \\ COMP 550, Fall 2024}
 \date{}
 \begin{document}
 \maketitle
@@ -24,30 +24,14 @@ a common approach at the time due to the small,
 supervised training corpora that was available. 
 The authors proposed two LSTM-based neural 
 architectures designed to generalize without 
-relying on external resources. Key 
-components of their methodology included: 
-IOBES tagging scheme (Inside, Outside, Beginning, 
-End, Singleton), and forming character-sensitive word 
-embeddings to capture orthographical and morphological 
+relying on external resources. A key 
+component of their methodology was
+the formation of character-sensitive word 
+embeddings, to capture orthographical and morphological 
 details. While the proposed models acheive 
 state-of-the-art performance, some aspects
 of the methodology limit the scope for generalization. 
-We delve into further detail on these matters.
-
-% evidence that
-% a token, or sequential group of tokens, is a name.
-% the dependence of classes on orthographic evidence,
-% While the authors
-% sucessfully acheive state-of-the-art performance,
-% their methodology is also limited
-% Shared at the input layer of these models 
-% are embedding decisions aimed to capture two intuitions: 
-% (i) reasoning jointly over tagging decisions as names 
-% can span multiple tokens, 
-% and (ii)
-
-
-\section*{Paper Content Overview}
+We continue in more detail.
 
 % - Describe the key approaches used:
 %   - Bidirectional LSTM-CRF model.
@@ -55,55 +39,69 @@ We delve into further detail on these matters.
 % - Discuss the use of character-based word representations combined with unsupervised pre-trained embeddings to improve generalization.
 % - Mention the experiments conducted on English, Dutch, German, and Spanish datasets, and their state-of-the-art results.
 
-The proposed neural architectures are (i) a 
-bidirectional LSTM supplemented with a CRF layer, and (ii)
-a greedy chunking algorithm utilizing a Stack-LSTM 
-(supports stack operations and embeddings for stack objects). 
+The proposed neural architectures are: a 
+bidirectional LSTM supplemented with a CRF layer, and,
+a greedy, transition-based chunking algorithm utilizing a Stack-LSTM 
+(supporting stack operations and embeddings for stack objects). 
 The main components of the bidirectional LSTM-CRF architecture,
-depicted in Figure 1: word embeddings, Bi-LSTM encoder, and CRF layer.
-The word embeddings
+as depicted in Figure 1, are: word embeddings, Bi-LSTM encoder, 
+and CRF layer. 
+% The word embeddings are the embeddings 
+% of each token in the input sequence (more on this later).
+The Bi-LSTM encoder consists of a forward and backward 
+LSTM, reading the input sequence from left to right, 
+and right to left, respectively.
+The bi-directional architecture is critical 
+for making informative encodings, 
+as the left or right context alone 
+may not capture the entire context of tokens  
+(homographical richness is an intuitive case). 
+
+% The forward LSTM captures the context to the left of each word, while the backward 
+% captures the context to the right. The forward and backward context for each token
+% are concatenated to capture the entire context.
 
 
-% \section*{Strengths and Limitations}
-% The researchers acheived the original task, 
-% - Strengths:
-%   - Language-independent, does not rely on hand-crafted features or gazetteers.
-%   - Achieves state-of-the-art results in multiple languages.
-%   - Effective use of character-based and word embeddings to handle morphology.
-% - Limitations:
-%   - The transition-based chunking model is more dependent on character-based information compared to the LSTM-CRF.
-%   - Greedy action selection in the Stack-LSTM model can lead to suboptimal results.
-%   The paper includes a detailed outline
-%   of the methodologies, and provides strong 
-%   justifications for its preprocessing decisions, 
-%   particularly at the input layer (arguing that LSTM's 
-%   are an a priori better function class for modeling 
-%   the relationship between words and their characters, 
-%   as they take into account position-variant features) .
-% \section*{Bidirectional LSTM-CRF Architecture (Figure 1)}
-% - Describe the key components:
-%   - Bidirectional LSTM: Encodes contextual information from both left and right contexts.
-%   - Conditional Random Field (CRF): Models dependencies between tags to produce globally optimal sequences.
-% - Explain the importance of these components:
-%   - Bidirectional LSTM captures comprehensive context for each word.
-%   - CRF layer ensures valid and coherent tag sequences.
+\section*{Strengths and Limitations}
+The researchers acheived the original task, 
+- Strengths:
+  - Language-independent, does not rely on hand-crafted features or gazetteers.
+  - Achieves state-of-the-art results in multiple languages.
+  - Effective use of character-based and word embeddings to handle morphology.
+- Limitations:
+  - The transition-based chunking model is more dependent on character-based information compared to the LSTM-CRF.
+  - Greedy action selection in the Stack-LSTM model can lead to suboptimal results.
+  The paper includes a detailed outline
+  of the methodologies, and provides strong 
+  justifications for its preprocessing decisions, 
+  particularly at the input layer (arguing that LSTM's 
+  are an a priori better function class for modeling 
+  the relationship between words and their characters, 
+  as they take into account position-variant features) .
+\section*{Bidirectional LSTM-CRF Architecture (Figure 1)}
+- Describe the key components:
+  - Bidirectional LSTM: Encodes contextual information from both left and right contexts.
+  - Conditional Random Field (CRF): Models dependencies between tags to produce globally optimal sequences.
+- Explain the importance of these components:
+  - Bidirectional LSTM captures comprehensive context for each word.
+  - CRF layer ensures valid and coherent tag sequences.
 
-% \section*{Handling of OOV Items}
-% - Describe how the proposed method addresses out-of-vocabulary (OOV) words:
-%   - Uses character-level embeddings generated by a bidirectional LSTM to represent words based on their characters.
-%   - Incorporates pre-trained embeddings to handle unseen words by mapping them to a common UNK embedding during training.
-% - Compare to class discussions:
-%   - Similar to character-level models we discussed, which also leverage character features to address OOV problems.
-%   - Pre-trained embeddings are akin to word2vec embeddings we discussed for capturing distributional semantics.
+\section*{Handling of OOV Items}
+- Describe how the proposed method addresses out-of-vocabulary (OOV) words:
+  - Uses character-level embeddings generated by a bidirectional LSTM to represent words based on their characters.
+  - Incorporates pre-trained embeddings to handle unseen words by mapping them to a common UNK embedding during training.
+- Compare to class discussions:
+  - Similar to character-level models we discussed, which also leverage character features to address OOV problems.
+  - Pre-trained embeddings are akin to word2vec embeddings we discussed for capturing distributional semantics.
 
-% \section*{Use of Gazetteers (Table 1)}
-% - Discuss methods incorporating gazetteers to improve NER performance:
-%   - Gazetteers can provide explicit, domain-specific named entity information, helping models generalize better.
-%   - Advantages: Improves recognition accuracy for specific entity types, especially in low-resource settings.
-%   - Disadvantages: Dependence on domain-specific resources reduces language independence and increases cost for new domains or languages.
+\section*{Use of Gazetteers (Table 1)}
+- Discuss methods incorporating gazetteers to improve NER performance:
+  - Gazetteers can provide explicit, domain-specific named entity information, helping models generalize better.
+  - Advantages: Improves recognition accuracy for specific entity types, especially in low-resource settings.
+  - Disadvantages: Dependence on domain-specific resources reduces language independence and increases cost for new domains or languages.
 
-% \section*{Conclusion}
-% - Summarize the overall contribution of the paper.
-% - Highlight the effectiveness of neural architectures for NER without relying on language-specific features.
+\section*{Conclusion}
+- Summarize the overall contribution of the paper.
+- Highlight the effectiveness of neural architectures for NER without relying on language-specific features.
 
 \end{document}
