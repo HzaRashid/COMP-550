@@ -13,7 +13,7 @@
 \maketitle
 
 \vspace{-5ex}
-\section*{Paper Summary}
+
 The paper, \textit{“A Structural Probe for Finding 
 Syntax in Word Representations”}, by John Hewitt and Christopher D. Manning,
 proposed a structural probe that tests a (neural-network based) 
@@ -25,7 +25,7 @@ structure-preserving (linear) maps
 between a language model's contextualized word representation space and 
 the spaces given by two metrics on the parse trees: one that encodes the
 distance between words in the tree, and one that encodes depth.
-The (english) language models in question are ELMo (embeddings from language model, a Bi-LSTM)
+The (english) language models in question are ELMo (embeddings from language model, a BiLSTM)
 and BERT (bidirectional encoder representations from transformers), 
 the latter utilizing an architecture not covered in class. The authors use the Wall Street Journal section of the 
 Penn Treebank corpus to test each model's ability to capture
@@ -39,34 +39,77 @@ encode features useful for training a parser, but not be capable of
 parsing themselves. While the proposed method effectively determines
 that ELMo and BERT capture syntactic knowledge, it is limited by its 
 strict formulation and reliance on supervised learning.
-\\
-\\
-% The paper introduces a probe to assess if parse trees 
-% are embedded in a linear transformation of contextual 
-% embeddings (e.g., from ELMo and BERT), 
-% focusing on measuring distances and depths 
-% in syntactic trees through squared L2 distance 
-% and L2 norm in the transformed vector space. 
-% Given a sequence
-% of words, a language model produces a sequence of vector representations
-% of each word.
+
+
 The proposed metrics consist of a squared L2 distance that encodes the 
 distance between words in the parse tree, and
 one in which squared L2 norm encodes depth in the parse tree, 
 where distance and depth are measured in edges. Distances between pairs of words
-are important for capturing hierarchical behavior, such as subject-verb agreement, and for recovering 
-the predicted tree (via the Minimum Spanning Tree algorithm) after applying the linear transformation 
-on the model's output vector sequence. On the other hand, the
-depth norm captures edge directions and imposes a total order on the words in a sentence.
-Naturally, the authors formulated the probes (for each metric) as matrices.
-If such transformations exist, they define inner products on the
-original space that capture the desired syntactic knowledge. 
-The authors utilized mini-batch gradient descent to optmize the probes'
-parameters, namely the entries of the matrices, with the loss for sample normalized by its squared length.
-% The authors use the fact that a linear transformation $B$ corresponds
-% to a family of inner products parametrized by a positive semidefinite matrix $A=B^{\top}B$,
-% making it possible to compute norms and distances after the transformation is applied.
+are important for capturing hierarchical behavior, such as subject-verb agreement,
+while the depth norm captures edge directions and imposes a total order 
+on the words in a sentence.
+The authors utilized mini-batch gradient descent on the corresponding matrices to minimize 
+L1 loss of the predicted (post-tranformation) squared distance over all word-pairs in a sentence, 
+or squared norm for each word. While this approach is minimal and effective, the probes
+are vulnerable to bias towards the supervised data, 
+potentially missing out on structural properties that are
+captured by the language models, but not captured by the true parse trees or the proposed metrics.
+In which case, an unsupervised approach can be useful for modelling such syntactic nuances
+that are not present in the dataset. However, in unsupervised learning,
+it is difficult to make concrete hypotheses and observations about how
+information is encoded by the language models. 
 
+
+The authors probed three representation models: 
+ELMo, BERT-base, and BERT-large. 
+They also probed baseline 
+models for more granular insights: LINEAR (from the assumption
+that English parse trees form a left-to-right
+chain), ELMo0 (character level word embeddings with no contextual information), 
+DECAY0 (assigns each word a weighted average
+of all ELMo0 embeddings in the sentence), 
+and PROJ0 (contextualizes the ELMo0 embeddings
+with a randomly initialized BiLSTM layer). 
+In addition to the L1 loss on word distances, 
+the authors reconstructed the tree given by
+the predicted distances (via the Minimum Spanning Tree algorithm) and evaluated 
+its Undirected Unlabeled Attachment Score – 
+the percentage of undirected edges placed correctly
+against the true tree. For distance correlation, 
+they computed the Spearman correlation between 
+true and predicted distances for each word in 
+each sentence, and averaged them between 
+all sentences of a fixed length (from 5 to 50).
+Similarly, they evaluated the models 
+on their ability to recreate the order of words 
+specified by their depth in the parse tree,
+computing the Spearman correlation between
+the true and predicted depth orderings,
+and averaging across sentence lengths as before. 
+A closely related evaluation metric ``root\%"
+looked at models’ accuracy in identifying the 
+root of the sentence as the shallowest.
+\\
+\\
+As depicted in Table 1 of the paper, 
+ELMo0 and DECAY0 failed to consistently outperform 
+the LINEAR model. This is likely owing to a lack of 
+context embedding, as PROJ0 delivered 
+the best results among the baseline models – 
+most notably acheiving a score of $73\%$ in its Spearman
+correlation averaged across the fixed lengths, only $10\%$ less
+than ELMo1 (first hidden layer of ELMo, and the most performant according to Figure 1).
+The BERT models consistently outperformed ELMo, with BERT-large's 16th hidden layer
+achieving scores in the high 80's in the distance and depth correlations
+and $90\%$ accuracy in root word predictions.
+The seventh hidden layer of BERT-base
+performed at most $2.1\%$ worse than layers 15 and 16 of BERT-large
+across all metrics, grounding the observation that the 
+effective rank of linear transformation required 
+was low compared to each layer's dimensionality in all models. 
+\\
+\\
+conclusion
 
 \section*{Strengths and Limitations}
 The approach is innovative in its simplicity and direct measurement of syntax structure, supporting evidence of hierarchical information in pretrained embeddings. The probe’s reliance on linear transformations makes it computationally efficient and interpretable. However, limitations include reliance on supervised data, which may bias results, and the probe's inability to capture syntactic nuances that require more complex transformations. Additionally, understanding the probe's practical applications beyond syntactic verification could be expanded upon.
