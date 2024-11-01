@@ -3,9 +3,9 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{geometry}
-\geometry{a4paper, margin=0.5in}
+\geometry{a4paper, margin=0.4in}
 \usepackage{titling}
-\setlength{\droptitle}{-3cm}
+\setlength{\droptitle}{-3.5cm}
 \title{ }
 \author{ Reading Assignment 2 \\ Hamza Rashid, 260971031 \\ COMP 550, Fall 2024}
 \date{}
@@ -13,11 +13,15 @@
 \maketitle
 
 \vspace{-5ex}
-
+Probing a language model for its syntactic knowledge is important
+for evaluating its ability to encode the grammatical structures of
+the language at hand, providing concrete architectural insights 
+that can guide troubleshooting and performance improvements in a variety of tasks.
 The paper, \textit{“A Structural Probe for Finding 
 Syntax in Word Representations”}, by John Hewitt and Christopher D. Manning,
 proposed a structural probe that tests a
-language model's ability to embed syntactic information. In particular,
+language model's ability to embed syntactic information. 
+In particular,
 the probe was trained to evaluate whether syntax trees are 
 embedded in a linear transformation of a 
 neural network’s word representation space.
@@ -34,7 +38,7 @@ To guide the research, the language models
 were compared against baselines that were expected to 
 encode features useful for training a parser, but not be capable of
 parsing themselves. While the proposed method provided strong evidence
-that ELMo and BERT capture syntactic knowledge as defined by the authors, 
+that ELMo and BERT encode the desired syntactic knowledge, 
 it is limited by its strict formulation and reliance on annotated data.
 
 The authors tested for syntactic knowledge 
@@ -98,26 +102,29 @@ looked at models’ accuracy in identifying the
 root of the sentence as the shallowest.
 
 
-As shown in Table 1 of the paper, 
+Shown in Table 1 of the paper, 
 PROJ0 delivered the best results among the baselines (but still worse than ELMo and BERT),
 likely owing to its contextual representations.
-The BERT models consistently outperformed ELMo, with BERT-large's $16^{th}$ hidden layer,
-the best overall, achieving scores in the high $80$'s in the distance and depth correlations, and $90\%$ accuracy in root word predictions.
+The BERT models consistently outperformed ELMo, 
+with BERT-large's $16^{th}$ hidden layer,
+the best overall, achieving scores in the 
+high $80$'s in the distance and depth correlations, 
+and $90\%$ accuracy in root word predictions.
 The best hidden layer of BERT-base
-performed no more than $3\%$ worse than the best two layers of BERT-large
-across all metrics, grounding the observation that the 
+performed no more than $3\%$ worse than the best layers of BERT-large
+across all evaluation metrics, grounding the observation that the 
 effective rank of linear transformation required 
-was low compared to each layer's dimensionality, as shown in figure 5.
+was low compared to each layer's dimensionality, as was shown in figure 5.
 
-Overall, the probe provided strong evidence for the existence of a
-syntax-encoding vector structure in both ELMo and BERT. However, the 
-proposed methods were not designed to test particular syntactic knowledge,
-but instead a strict notion where all pairs of words know their syntactic distance and ordering. 
-Probing a model for its syntactic knowledge is crucial 
-for directly evaluating its ability to capture the meaning of 
-an input sentence. It can provide concrete insights that 
-can be used to improve the performance of language models in a variety of tasks,
-like word sense disambiguation and machine translation.
+Overall, the probe provided strong evidence for the existence of
+syntax-encoding vector structures in ELMo and BERT. The probe,
+while simple and effective, has no specific parsing ability, and is prone 
+to missing syntactic details that are not present in the PTB WSJ dataset or
+cannot be retained in their strict metric formulations. On the other hand, it 
+is difficult to obtain concrete insights in an unsupervised approach.
+Such tradeoffs between probe complexity, probe task, and hypotheses tested
+are a common struggle probing literature.
+
 
 \section*{References}
 Hewitt, J., \& Manning, C. D. (2019). A Structural Probe for Finding Syntax in Word Representations. In \textit{Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)} (pp. 4129–4138). Association for Computational Linguistics.
