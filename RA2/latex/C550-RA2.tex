@@ -3,7 +3,7 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{geometry}
-\geometry{a4paper, margin=0.4in}
+\geometry{a4paper, margin=0.45in}
 \usepackage{titling}
 \setlength{\droptitle}{-3.5cm}
 \title{ }
@@ -37,13 +37,11 @@ approximate the linear transformations.
 To guide the research, the language models
 were compared against baselines that were expected to 
 encode features useful for training a parser, but not be capable of
-parsing themselves. While the proposed method provided strong evidence
+parsing themselves. While the probe found strong evidence
 that ELMo and BERT encode the desired syntactic knowledge, 
 it is limited by its strict formulation and reliance on annotated data.
 
-The authors tested for syntactic knowledge 
-in the form of parse trees, and
-the probe was trained to approximate
+The probe was trained to approximate
 linear (structure-preserving, matrix-form) maps
 from a language model's contextualized word representation space to 
 the spaces given by two metrics on the parse trees: 
@@ -97,7 +95,7 @@ specified by their depth in the parse tree,
 and the Spearman correlations between
 the true and predicted depth orderings
 were averaged as before. 
-A closely related evaluation metric ``root\%"
+A closely related evaluation metric, ``root\%",
 looked at models’ accuracy in identifying the 
 root of the sentence as the shallowest.
 
