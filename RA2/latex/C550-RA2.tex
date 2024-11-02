@@ -13,7 +13,7 @@
 \maketitle
 
 \vspace{-5ex}
-Probing a language model for syntactic knowledge is important
+Probing a language model for its syntactic knowledge is important
 for evaluating its ability to encode the grammatical structures of
 the language at hand, providing concrete architectural insights 
 that can help improve its generalizability in syntax-sensitive tasks.
@@ -60,9 +60,9 @@ to minimize L1 loss of the post-transformation squared distances and squared nor
 over all word-pairs and individual words in a sentence, respectively.
 While this approach is minimal and provides concrete insights,
 its bias towards the supervised data makes it prone to filtering
-out other, possibly correct, syntactic details that are
+out potentially useful syntactic details that are
 encoded by the language models.
-An unsupervised method can be useful for modelling such syntactic nuances
+An unsupervised method can be useful for modeling such syntactic nuances
 that are not present in the dataset. However, in this alternative,
 it is difficult to make concrete hypotheses and observations about how
 information is encoded by the language models. 
@@ -83,8 +83,7 @@ distances reconstructed the true parse trees
 and correlated with the parse trees’
 distance metrics. Given an input sentence, the predicted distances
 were used to construct the minimum spanning (predicted) tree, 
-which was evaluated on its Undirected Unlabeled Attachment Score – 
-the percentage of undirected edges placed correctly
+which was evaluated on its Undirected Unlabeled Attachment Score---the percentage of undirected edges placed correctly
 against the true tree. Furthermore, the authors
 averaged the Spearman correlation between 
 the true and predicted distances for 
@@ -102,7 +101,7 @@ looked at models’ accuracy in identifying the
 root of the sentence as the shallowest.
 
 
-Shown in Table 1 of the paper, 
+As shown in Table 1 of the paper, 
 PROJ0 delivered the best results among the baselines (but still worse than ELMo and BERT),
 likely owing to its contextual representations.
 The BERT models consistently outperformed ELMo, 
@@ -120,7 +119,7 @@ Overall, the probe provided strong evidence for the existence of
 syntax-encoding vector structures in ELMo and BERT. The probe,
 while simple and effective, has no specific parsing ability and is prone 
 to missing syntactic details that are not present in the PTB WSJ dataset or
-cannot be retained in their strict metric formulations. On the other hand, it 
+cannot be retained in the strict metric formulations. On the other hand, it 
 is difficult to obtain concrete insights in an unsupervised approach.
 These tradeoffs between probe complexity, probe task, and hypotheses tested
 are a common challenge in probing literature.
