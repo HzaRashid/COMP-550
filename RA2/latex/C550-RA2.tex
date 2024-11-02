@@ -13,36 +13,38 @@
 \maketitle
 
 \vspace{-5ex}
-Probing a language model for its syntactic knowledge is important
+Probing a language model for syntactic knowledge is important
 for evaluating its ability to encode the grammatical structures of
 the language at hand, providing concrete architectural insights 
-that can guide troubleshooting and performance improvements in a variety of tasks.
-The paper, \textit{“A Structural Probe for Finding 
-Syntax in Word Representations”}, by John Hewitt and Christopher D. Manning,
+that can help improve its generalizability in syntax-sensitive tasks.
+The paper, \textit{``A Structural Probe for Finding 
+Syntax in Word Representations''}, by John Hewitt and Christopher D. Manning,
 proposed a structural probe that tests a
 language model's ability to embed syntactic information. 
 In particular,
 the probe was trained to evaluate whether syntax trees are 
 embedded in a linear transformation of a 
 neural network’s word representation space.
-The (pre-trained, english) language models in question were ELMo (embeddings from language model, a BiLSTM)
-and BERT (bidirectional encoder representations from transformers), 
-the latter utilizing an architecture not covered in class. The authors used 
+The pre-trained English language models used in the paper were 
+ELMo (Embeddings from Language Model, a BiLSTM) 
+and BERT (Bidirectional Encoder Representations from Transformers), 
+the latter utilizing an architecture not covered in class. 
+The authors used 
 the Wall Street Journal section of the 
 Penn Treebank corpus to test each model's ability to capture
 the Stanford Dependencies formalism. 
 They utilized supervised learning on the dataset
 to train the probe, namely the matrices that 
 approximate the linear transformations.
-To guide the research, the language models
-were compared against baselines that were expected to 
-encode features useful for training a parser, but not be capable of
-parsing themselves. While the probe found strong evidence
+The language models were compared against baselines 
+expected to encode features useful for parser training 
+but not capable of performing parsing on their own. 
+While the probe found strong evidence
 that ELMo and BERT encode the desired syntactic knowledge, 
 it is limited by its strict formulation and reliance on annotated data.
 
 The probe was trained to approximate
-linear (structure-preserving, matrix-form) maps
+linear (structure-preserving) maps, represented as matrices,
 from a language model's contextualized word representation space to 
 the spaces given by two metrics on the parse trees: 
 a squared L2 distance encoding 
@@ -54,8 +56,8 @@ while the depth norm captures edge directions and imposes a total order
 on the words in a sentence. These intuitions are complementary 
 in encoding the structural properties of the parse tree.
 The authors used mini-batch gradient descent 
-to minimize L1 loss of the post-tranformation squared distances and 
-squared norms over all word-pairs and individual words in a sentence, respectively.
+to minimize L1 loss of the post-transformation squared distances and squared norms
+over all word-pairs and individual words in a sentence, respectively.
 While this approach is minimal and provides concrete insights,
 its bias towards the supervised data makes it prone to filtering
 out other, possibly correct, syntactic details that are
@@ -71,11 +73,11 @@ ELMo, BERT-base, and BERT-large.
 These were compared with simpler baseline 
 models: LINEAR (from the assumption
 that English parse trees form a left-to-right
-chain), ELMo0 (character level word embeddings with no contextual information), 
+chain), ELMo0 (character-level word embeddings with no contextual information), 
 DECAY0 (assigns each word a weighted average
 of all ELMo0 embeddings in the sentence), 
 and PROJ0 (contextualizes the ELMo0 embeddings
-with a randomly initialized BiLSTM layer).
+with an untrained BiLSTM layer).
 The models were evaluated on how well the predicted
 distances reconstructed the true parse trees 
 and correlated with the parse trees’
@@ -95,7 +97,7 @@ specified by their depth in the parse tree,
 and the Spearman correlations between
 the true and predicted depth orderings
 were averaged as before. 
-A closely related evaluation metric, ``root\%",
+A closely related evaluation metric, ``root\%'',
 looked at models’ accuracy in identifying the 
 root of the sentence as the shallowest.
 
@@ -106,22 +108,22 @@ likely owing to its contextual representations.
 The BERT models consistently outperformed ELMo, 
 with BERT-large's $16^{th}$ hidden layer,
 the best overall, achieving scores in the 
-high $80$'s in the distance and depth correlations, 
+high $80$s in the distance and depth correlations, 
 and $90\%$ accuracy in root word predictions.
 The best hidden layer of BERT-base
 performed no more than $3\%$ worse than the best layers of BERT-large
 across all evaluation metrics, grounding the observation that the 
 effective rank of linear transformation required 
-was low compared to each layer's dimensionality, as was shown in figure 5.
+was low compared to each layer's dimensionality, as shown in Figure 5 of the paper.
 
 Overall, the probe provided strong evidence for the existence of
 syntax-encoding vector structures in ELMo and BERT. The probe,
-while simple and effective, has no specific parsing ability, and is prone 
+while simple and effective, has no specific parsing ability and is prone 
 to missing syntactic details that are not present in the PTB WSJ dataset or
 cannot be retained in their strict metric formulations. On the other hand, it 
 is difficult to obtain concrete insights in an unsupervised approach.
-Such tradeoffs between probe complexity, probe task, and hypotheses tested
-are a common struggle probing literature.
+These tradeoffs between probe complexity, probe task, and hypotheses tested
+are a common challenge in probing literature.
 
 
 \section*{References}
