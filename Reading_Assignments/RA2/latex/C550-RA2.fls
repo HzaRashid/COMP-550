@@ -1,8 +1,8 @@
-PWD /Users/hamzarashid/Desktop/comp550/RA2/latex
+PWD /Users/hamzarashid/Desktop/comp550/Reading_Assignments/RA2/latex
 INPUT /usr/local/texlive/2024/texmf.cnf
 INPUT /usr/local/texlive/2024/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/hamzarashid/Desktop/comp550/RA2/latex/C550-RA2.tex
+INPUT /Users/hamzarashid/Desktop/comp550/Reading_Assignments/RA2/latex/C550-RA2.tex
 OUTPUT C550-RA2.log
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
