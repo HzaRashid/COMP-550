@@ -18,21 +18,19 @@ from nltk.corpus import wordnet
 import numpy as np
 import pandas as pd
 import re
-
-    
+import os
 
 ''' PREPROCESS DATA:
 Column 0: 'text'    (string)
 Column 1: 'is_fact' (boolean)
 '''
-
 # FACTS
-fact_data = pd.read_csv('./data/facts.txt', sep='\t', names=['text'])
+fact_data = pd.read_csv(os.path.join(os.path.dirname(__file__),'./data/facts.txt'), sep='\t', names=['text'])
 fact_data['is_fact'] = 1
 # print(fact_data.head()) # verify
 
 # FAKES
-fake_data = pd.read_csv('./data/fakes.txt', sep='\t', names=['text'])
+fake_data = pd.read_csv(os.path.join(os.path.dirname(__file__),'./data/fakes.txt'), sep='\t', names=['text'])
 fake_data['is_fact'] = 0
 # print(fake_data.head()) # verify
 
