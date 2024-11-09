@@ -1,5 +1,4 @@
 '''IMPORT'''
-
 from loader import main_data_loader
 import os
 # # Download nltk submodules
