@@ -7,6 +7,7 @@ import xml.etree.cElementTree as ET
 import codecs
 import os
 
+
 class WSDInstance:
     def __init__(self, my_id, lemma, context, index):
         self.id = my_id         # id of the WSD instance
@@ -85,6 +86,7 @@ def main_data_loader():
     # print(len(dev_instances)) # number of dev instances
     # print(len(test_instances)) # number of test instances
     return dev_instances, test_instances
+
 
 if __name__ == '__main__':
     main_data_loader()

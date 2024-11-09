@@ -13,8 +13,6 @@ from nltk.corpus import wordnet
 # train_data, test_data = main_data_loader()
 # print(len(train_data), len(test_data))
 
-
-
 test_str = "Latin_america".lower()
 
 synsets = wordnet.synsets(test_str)
@@ -23,7 +21,7 @@ sense_freqs = {}
 for synset in synsets:
     # print("SYNSET:", synset.name())
     if synset.name()[-2:] != '01': continue
-    
+
     for lemma in synset.lemmas():
         if lemma.name().lower() != test_str: continue
         sense_freqs[lemma.key()] = lemma.count()
