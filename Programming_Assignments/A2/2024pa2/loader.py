@@ -17,7 +17,8 @@ class WSDInstance:
         '''
         For printing purposes.
         '''
-        return '%s\t%s\t%s\t%d' % (self.id, self.lemma, ' '.join(self.context), self.index)
+        return f"{self.id}\t{self.lemma}\t{' '.join(s.decode('ascii') for s in self.context)}\t{self.index}"
+
 
 def load_instances(f):
     '''
@@ -45,6 +46,7 @@ def load_instances(f):
                     instances[my_id] = WSDInstance(my_id, lemma, context, i)
     return dev_instances, test_instances
 
+
 def load_key(f):
     '''
     Load the solutions as dicts.
@@ -63,11 +65,13 @@ def load_key(f):
             test_key[my_id] = sense_key.split()
     return dev_key, test_key
 
+
 def to_ascii(s):
     # remove all non-ascii characters
     return codecs.encode(s, 'ascii', 'ignore')
 
-if __name__ == '__main__':
+
+def main_data_loader():
     data_f = os.path.join(os.path.dirname(__file__), 'multilingual-all-words.en.xml')
     key_f = os.path.join(os.path.dirname(__file__),'wordnet.en.key')
     dev_instances, test_instances = load_instances(data_f)
@@ -78,6 +82,10 @@ if __name__ == '__main__':
     test_instances = {k:v for (k,v) in test_instances.items() if k in test_key}
     
     # read to use here
-    print(len(dev_instances)) # number of dev instances
-    print(len(test_instances)) # number of test instances
+    # print(len(dev_instances)) # number of dev instances
+    # print(len(test_instances)) # number of test instances
+    return dev_instances, test_instances
+
+if __name__ == '__main__':
+    main_data_loader()
     
