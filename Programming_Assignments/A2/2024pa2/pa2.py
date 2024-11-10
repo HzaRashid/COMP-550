@@ -34,16 +34,14 @@ for document in dev_data:
     for synset in synsets:
         for lemma in synset.lemmas():
             if lemma.name().lower() != x.lower(): continue
-            if lemma.count() not in sense_freqs:
-                sense_freqs[lemma.count()] = []
-            sense_freqs[lemma.count()].append(lemma.key())
-            print(lemma._key)
+            lc = lemma.count()
+            if lc not in sense_freqs: sense_freqs[lc] = []
+            sense_freqs[lc].append(lemma.key())
 
-    max_freq = max(sense_freqs)
+    
     for sense_key in sense_freqs[max(sense_freqs)]:
         if sense_key == dev_data[document]:
             # correct_prediction_ct += 1
             break
-
 
 print(correct_prediction_ct)
