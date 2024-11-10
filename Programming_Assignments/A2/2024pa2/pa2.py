@@ -27,7 +27,6 @@ correct_prediction_ct = 0
 i = 0
 for document in dev_data:
     x = dev_data[document].lemma.decode('ascii')
-    if x=='reduction': print('\n\n\n',x,'\n\n\n')
 
     synsets = wordnet.synsets(x)
 
@@ -46,5 +45,5 @@ for document in dev_data:
             # correct_prediction_ct += 1
             break
 
-print(correct_prediction_ct)
 
+print(correct_prediction_ct)
