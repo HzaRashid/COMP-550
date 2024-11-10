@@ -85,7 +85,7 @@ def main_data_loader():
     # read to use here
     # print(len(dev_instances)) # number of dev instances
     # print(len(test_instances)) # number of test instances
-    return dev_instances, test_instances
+    return dev_instances, test_instances, dev_key, test_key
 
 
 if __name__ == '__main__':
