@@ -10,16 +10,39 @@ import os
 # nltk.download('punkt_tab', download_dir=download_dir)
 # #
 from nltk.corpus import wordnet as wn
+from nltk.wsd import lesk 
+from nltk.tokenize import word_tokenize, RegexpTokenizer
+from nltk.corpus import stopwords
 
 
 dev_data, test_data, dev_key, test_key = main_data_loader()
+stop_words = set(stopwords.words('english'))
+
+def eval_lesk(data, keys):
+    regex_tok = RegexpTokenizer(r'\w+').tokenize
+
+    cur_sent = [None, None]
+    for _id in data:
+        s = _id.split('.')[1]
+        if s != cur_sent[0]: 
+            cur_sent[0] = s
+            cur_sent[1] = ' '.join(regex_tok(
+                ' '.join(filter(lambda x: x not in stop_words, 
+                    map(lambda x: x.decode('ascii').lower(), 
+                        data[_id].context) 
+                    ))))
+            
+        x = data[_id].lemma.decode('ascii')
+        lesk_ = lesk(context_sentence=cur_sent[1], ambiguous_word=x)
+        print(lesk_)
+
 
 
 def eval_mfs(data, keys):
     correct_prediction_ct = 0
-    for document_id in data:
+    for doc_id in data:
         freq2sense = {}
-        x = data[document_id].lemma.decode('ascii')
+        x = data[doc_id].lemma.decode('ascii')
         for synset in wn.synsets(x):
             x_sense = None
             synsetfq = 0
@@ -32,11 +55,12 @@ def eval_mfs(data, keys):
                 freq2sense[synsetfq] = []
             freq2sense[synsetfq].append(x_sense)
             
-        if set(freq2sense[max(freq2sense)]).intersection(keys[document_id]):
+        if set(freq2sense[max(freq2sense)]).intersection(keys[doc_id]):
             correct_prediction_ct += 1
 
     print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
 if __name__ == "__main__":
-    eval_mfs(test_data, test_key)
+    # eval_mfs(test_data, test_key)
+    eval_lesk(dev_data, dev_key)
