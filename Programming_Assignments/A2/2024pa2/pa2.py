@@ -36,7 +36,7 @@ def eval_lesk(data, keys):
         x = data[_id].lemma.decode('ascii')
         synset = lesk(context_sentence=cur_sent[1], ambiguous_word=x)
         sense = None
-        
+
         for lemma in synset.lemmas():
             if lemma.name().lower() == x.lower():
                 sense = lemma.key()
