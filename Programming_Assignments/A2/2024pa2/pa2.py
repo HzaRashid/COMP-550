@@ -20,6 +20,7 @@ stop_words = set(stopwords.words('english'))
 tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
 
 def eval_lesk(data, keys):
+    correct_prediction_ct = 0
     cur_sent = [None, None]
 
     for _id in data:
@@ -27,14 +28,23 @@ def eval_lesk(data, keys):
         if s != cur_sent[0]: 
             cur_sent[0] = s
             cur_sent[1] = ' '.join(tokenize(
-                ' '.join(filter(lambda x: x not in stop_words, 
-                    map(lambda x: x.decode('ascii').lower(), 
+                ' '.join(filter(lambda x: x.lower() not in stop_words, 
+                    map(lambda x: x.decode('ascii'), 
                         data[_id].context) 
                     ))))
             
         x = data[_id].lemma.decode('ascii')
-        lesk_ = lesk(context_sentence=cur_sent[1], ambiguous_word=x)
-        print(lesk_)
+        synset = lesk(context_sentence=cur_sent[1], ambiguous_word=x)
+        sense = None
+        
+        for lemma in synset.lemmas():
+            if lemma.name().lower() == x.lower():
+                sense = lemma.key()
+                break
+        if sense in keys[_id]:
+            print('foo')
+
+        # print(lesk_.name())
 
 
 
@@ -62,5 +72,5 @@ def eval_mfs(data, keys):
 
 
 if __name__ == "__main__":
-    eval_mfs(test_data, test_key)
-    # eval_lesk(dev_data, dev_key)
+    # eval_mfs(test_data, test_key)
+    eval_lesk(dev_data, dev_key)
