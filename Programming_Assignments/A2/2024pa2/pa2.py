@@ -30,7 +30,7 @@ def eval_lesk(data, keys):
             cur_sent[1] = tokenize(' '.join(
                 filter(lambda x: x.lower() not in stop_words,
                     map(lambda x: x.decode('ascii'), data[_id].context)
-                    )))
+                    )).replace('_', ' '))
             
         x = data[_id].lemma.decode('ascii')
         synset = lesk(context_sentence=cur_sent[1], 
@@ -75,3 +75,8 @@ def eval_mfs(data, keys):
 if __name__ == "__main__":
     # eval_mfs(test_data, test_key)
     eval_lesk(test_data, test_key)
+
+    # x = 'North_America'
+    # for synset in wn.synsets(x):
+    #     print(synset, synset.definition())
+
