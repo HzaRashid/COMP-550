@@ -27,24 +27,22 @@ def eval_lesk(data, keys):
         s = _id.split('.')[1]
         if s != cur_sent[0]: 
             cur_sent[0] = s
-            cur_sent[1] = ' '.join(tokenize(
-                ' '.join(filter(lambda x: x.lower() not in stop_words, 
-                    map(lambda x: x.decode('ascii'), 
-                        data[_id].context) 
-                    ))))
+            cur_sent[1] = tokenize(' '.join(
+                filter(lambda x: x.lower() not in stop_words,
+                    map(lambda x: x.decode('ascii'), data[_id].context)
+                    )))
             
         x = data[_id].lemma.decode('ascii')
         synset = lesk(context_sentence=cur_sent[1], ambiguous_word=x)
         sense = None
-
         for lemma in synset.lemmas():
             if lemma.name().lower() == x.lower():
                 sense = lemma.key()
                 break
         if sense in keys[_id]:
-            print('foo')
+            correct_prediction_ct += 1
 
-        # print(lesk_.name())
+    print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
 
@@ -73,4 +71,4 @@ def eval_mfs(data, keys):
 
 if __name__ == "__main__":
     # eval_mfs(test_data, test_key)
-    eval_lesk(dev_data, dev_key)
+    eval_lesk(test_data, test_key)
