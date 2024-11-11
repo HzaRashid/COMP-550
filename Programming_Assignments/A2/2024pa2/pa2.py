@@ -11,22 +11,22 @@ import os
 # #
 from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk 
-from nltk.tokenize import word_tokenize, RegexpTokenizer
+from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 
 
 dev_data, test_data, dev_key, test_key = main_data_loader()
 stop_words = set(stopwords.words('english'))
+tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
 
 def eval_lesk(data, keys):
-    regex_tok = RegexpTokenizer(r'\w+').tokenize
-
     cur_sent = [None, None]
+
     for _id in data:
         s = _id.split('.')[1]
         if s != cur_sent[0]: 
             cur_sent[0] = s
-            cur_sent[1] = ' '.join(regex_tok(
+            cur_sent[1] = ' '.join(tokenize(
                 ' '.join(filter(lambda x: x not in stop_words, 
                     map(lambda x: x.decode('ascii').lower(), 
                         data[_id].context) 
@@ -62,5 +62,5 @@ def eval_mfs(data, keys):
 
 
 if __name__ == "__main__":
-    # eval_mfs(test_data, test_key)
-    eval_lesk(dev_data, dev_key)
+    eval_mfs(test_data, test_key)
+    # eval_lesk(dev_data, dev_key)
