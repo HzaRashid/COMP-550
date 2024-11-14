@@ -2,7 +2,7 @@
 from loader import main_data_loader
 import os
 # # Download nltk data
-# download_dir = f"{os.getenv('VIRTUAL_ENV')}/lib/nltk_data"
+download_dir = f"{os.getenv('VIRTUAL_ENV')}/lib/nltk_data"
 # import nltk
 # nltk.download('wordnet', download_dir=download_dir)
 # nltk.download('stopwords', download_dir=download_dir)
@@ -31,9 +31,8 @@ def eval_NEO(data, keys):
         item_lemma = item.lemma.decode('ascii')
         if id != cur_sent[0]:
             cur_sent[0] = id
-            cur_sent[1] = map(lambda x: x.decode('ascii'), item.context)
+            cur_sent[1] = ' '.join(map(lambda x: x.decode('ascii'), item.context))
 
-        print(cur_sent)
         def_and_examples = {}
         synsets = wn.synsets(item_lemma)
         # gather definition and examples
@@ -42,10 +41,11 @@ def eval_NEO(data, keys):
             def_and_examples[synset].append(synset.definition())
             for example in synset.examples():
                 def_and_examples[synset].append(example)
+
         print(def_and_examples)
 
 
-''' Established Models '''
+''' Baseline Models '''
 def eval_lesk(data, keys):
     # Lesk (using WordNet)
     correct_prediction_ct = 0
