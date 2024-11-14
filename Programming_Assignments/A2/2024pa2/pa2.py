@@ -13,13 +13,41 @@ from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk 
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
+# from nltk.stem import WordNetLemmatizer
 
 
 dev_data, test_data, dev_key, test_key = main_data_loader()
 stop_words = set(stopwords.words('english'))
 tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
+# lemmatize = WordNetLemmatizer().lemmatize
 
+''' MODELS '''
+
+''' Custom Models '''
+def eval_NEO(data, keys):
+    # Named Entity Overlap
+    cur_sent = [None, None]
+    for id, item in data.items():
+        item_lemma = item.lemma.decode('ascii')
+        if id != cur_sent[0]:
+            cur_sent[0] = id
+            cur_sent[1] = map(lambda x: x.decode('ascii'), item.context)
+
+        print(cur_sent)
+        def_and_examples = {}
+        synsets = wn.synsets(item_lemma)
+        # gather definition and examples
+        for synset in synsets:
+            def_and_examples[synset] = []
+            def_and_examples[synset].append(synset.definition())
+            for example in synset.examples():
+                def_and_examples[synset].append(example)
+        print(def_and_examples)
+
+
+''' Established Models '''
 def eval_lesk(data, keys):
+    # Lesk (using WordNet)
     correct_prediction_ct = 0
     cur_sent = [None, None]
 
@@ -48,8 +76,8 @@ def eval_lesk(data, keys):
     print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
-
 def eval_mfs(data, keys):
+    # Most Frequent Sense (using pretrained frequencies)
     correct_prediction_ct = 0
     for doc_id in data:
         freq2sense = {}
@@ -72,11 +100,32 @@ def eval_mfs(data, keys):
     print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
+''' HELPERS '''
+def get_NE_tags(sentence):
+    return set(label.value for label in sentence.get_labels())
+
+def overlap_quantity(context1, context2):
+    if len(context1) < len(context2):
+        context1, context2 = context2, context1
+    return len(set(context1).intersection(context2))
+
+def get_max_NEO_synset(context, synsets):
+    return max([
+        (synset, overlap_quantity(context, synset)) \
+        for synset in synsets
+    ], key=lambda x: x[1])
+
 if __name__ == "__main__":
+    eval_NEO(dev_data, dev_key)
     # eval_mfs(test_data, test_key)
-    eval_lesk(test_data, test_key)
+    # eval_lesk(test_data, test_key)
 
     # x = 'North_America'
     # for synset in wn.synsets(x):
     #     print(synset, synset.definition())
 
+    # for synset in wn.synsets('car'):
+    #     print(synset, synset.definition())
+
+    #     for lemma in synset.lemmas():
+    #         print(lemma, lemma.hypernyms())
