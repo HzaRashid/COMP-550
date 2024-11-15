@@ -1,7 +1,5 @@
 '''IMPORT'''
-from loader import main_data_loader
 import os
-# import nltk
 from nltk.corpus import wordnet as wn
 # from nltk.tokenize import RegexpTokenizer
 # from nltk.corpus import stopwords
@@ -12,26 +10,21 @@ from ast import literal_eval
 import random 
 # stop_words = set(stopwords.words('english'))
 # tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
-# load the NER tagger
+
+
+''' Flair NER model '''
 NERtagger = Classifier.load('ner-fast')
 
+''' load data '''
 data = pd.read_csv(
-    sep='\t', 
     filepath_or_buffer=os.path.join(os.path.dirname(__file__), 'pa2data.tsv'),
-    converters={'label':literal_eval}
+    converters={'label':literal_eval},
+    sep='\t'
     )
 
-print(type(data.iloc[0]['label']))
-
-
-
 train_data = data[data['id'].str.startswith('d001')]
-print(train_data.head())
-print(len(train_data))
 
 ''' MODELS '''
-
-''' Custom Models '''
 def eval_NEO(data):
     # Named Entity Overlap
     correct_prediction_ct = 0
@@ -64,6 +57,7 @@ def eval_NEO(data):
 
     print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
+
 # pick first synset every time
 def eval_baseline(data):
     # Named Entity Overlap
@@ -83,6 +77,7 @@ def eval_baseline(data):
             correct_prediction_ct += 1
 
     print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
+
 
 ''' HELPERS '''
 def get_NE_tags(sentence):
