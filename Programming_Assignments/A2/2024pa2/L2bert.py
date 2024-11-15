@@ -9,10 +9,11 @@ import numpy as np
 
 ''' load data '''
 data = pd.read_csv(
-    sep='\t', 
     filepath_or_buffer=os.path.join(os.path.dirname(__file__), 'pa2data.tsv'),
-    converters={'label':literal_eval}
+    converters={'label':literal_eval},
+    sep='\t'
     )
+
 train_data = data[data['id'].str.startswith('d001')]
 
 ''' get pre-trained model for embeddings'''
@@ -61,7 +62,7 @@ def eval_L2_bert(data):
 
 
 if __name__ == "__main__":
-    eval_L2DS(train_data)
+    eval_L2_bert(train_data)
     # import numpy as np
     # # init embedding
     # embedding = TransformerDocumentEmbeddings('bert-base-uncased')
