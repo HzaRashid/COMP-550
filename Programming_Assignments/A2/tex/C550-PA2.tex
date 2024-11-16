@@ -37,16 +37,28 @@ and case retention. The relatively poor performance is likely caused by the spec
 
 \subsection{Custom Methods}
 \subsubsection{Method 1: Named Entity Overlap (NEO)}
-Explain the use of a pretrained language model (e.g., BERT) for WSD, including how contextual embeddings were utilized to resolve word senses.
-For NEO, we perform a variant of Lesk on the named entities of the context and synset example or definition (when no example text exists).
-Our intuition is that an example is liklier to contain meaningful entities to be compared against. A 
-key challenge faced in this approach is the sparsity of entities. As a result, we experimented with various models
-varying in size, speed, and number of entities used in their pre-training. The latter addresses the sparsity directly,
-while the former two explore the tradeoffs between speed and accuracy.
+% Explain the use of a pretrained language model (e.g., BERT) for WSD, including how contextual embeddings were utilized to resolve word senses.
+For NEO, we perform a variant of Lesk, computing overlap between the named entities of 
+the context and the synset example text or definition (when no example exists).
+Our intuition is that an example is likelier to contain meaningful entities to be compared against,
+which proved to be effective on the dev set. Notable challenges in 
+this method include: sparsity of entities in both the synset texts 
+(resorting to the definition when an example was not available) and the sequence-labeling models' tag sets. 
+As a result, we experimented with various models varying in size, speed, and number of tags. 
+The latter addresses the sparsity directly, while the former two explore the tradeoffs between speed and accuracy. 
+The pre-trained models were based on the BiLSTM-CRF sequence-labeling architecture proposed in 
+\textit{``Contextual String Embeddings for Sequence Labeling"}, 
+by Akbik, Blythe, and Vollgraf (2018), namely: \texttt{Flair English 4-class NER} and \texttt{Flair English 18-class NER}.
+We evaluated the \texttt{base} and \texttt{fast} variants of the former, and the \texttt{large} and \texttt{fast} variants of the latter on the dev set, 
+getting the best results with the 18-class fast model. The 4-class model predicts tags \texttt{PER, LOC, ORG, and MISC}---person, location, organization, and other, respectively. 
+In addition to the 4-class tags, the 18-class model predicts some tags that are relevant to our task, such as \texttt{GPE} (geo-political entities) and \texttt{NORP} (nationalities or 
+religious or political groups). This reduces sparsity in the dataset's tags, making it easier to resolve the names of domain specific phrases. On the other hand,
+general purpose words that are collocated with domain specific phrases are often harder to resolve since
+the definition and example text will rarely use political terms.
 
 \subsubsection{Method 2: Transformer embeddings L2 distances (TeL2d)}
-Describe the design and implementation of the second method, highlighting its uniqueness 
-compared to the first method. Our hypothesis is that a transformer's contextualized embeddings 
+% Describe the design and implementation of the second method, highlighting its uniqueness compared to the first method.
+Our hypothesis is that a transformer's contextualized embeddings 
 % ability to encode both syntactic and semantic information
 can be used to accurately identify the sense of a word, given its context and synsets'
 examples (if they exist) or definition. We use a pre-trained transformer

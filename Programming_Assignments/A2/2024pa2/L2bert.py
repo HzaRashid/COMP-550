@@ -1,5 +1,6 @@
 '''IMPORT'''
-from flair.embeddings import TransformerDocumentEmbeddings as tde
+from flair.embeddings import TransformerDocumentEmbeddings as TDE
+from flair.embeddings import TransformerWordEmbeddings as TWE
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
@@ -18,8 +19,10 @@ data = pd.read_csv(
     )
 
 train_data = data[data['id'].str.startswith('d001')]
+test_data = data[~data['id'].str.startswith('d001')]
 tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
 
+''' model evaluation '''
 def eval_embedding_L2(data, embedder):
     ''' 
     L2 distance between transformer embeddings
@@ -32,8 +35,19 @@ def eval_embedding_L2(data, embedder):
         s = item.id.split('.')[1]
         if s != cur_sent[0]:
             cur_sent[0] = s
-            cur_sent[1] = Sentence(item.context.replace('_', ' '))
-            embedder.embed(cur_sent[1])
+            sent = Sentence(item.context.replace('_', ' '))
+            
+            # cur_sent[1] = Sentence(item.context.replace('_', ' '))
+            # embedder.embed(cur_sent[1])
+
+           
+            word_embedder = TWE(embedder.base_model_name)
+            word_embedder.embed(sent)
+            for token in sent:
+                if token.text != item.lemma: continue
+                cur_sent[1] = token
+                break
+                # print(token.embedding)
 
         synsets = wn.synsets(item.lemma)
         tagged_synsets = []
@@ -57,30 +71,34 @@ def eval_embedding_L2(data, embedder):
     print(f'{embedder.base_model_name} Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
-
 def dev_pipeline(models={
-    # 'bert-base-cased': 12, # number of layers
-    'sentence-transformers/all-mpnet-base-v2': 12,
-    'sentence-transformers/all-MiniLM-L6-v2': 6
+    'bert-base-cased': 12, # number of layers
+    # 'sentence-transformers/all-mpnet-base-v2': 12,
+    # 'sentence-transformers/all-MiniLM-L6-v2': 6
     }):
 
     for m in models:
         for layer in range(1, models[m] + 1):
-            print(f'==============>{m}, layer {layer}...<==============')
+            print(f'==============>evaluating {m}, layer {layer}...<==============')
             eval_embedding_L2(train_data, 
-                              tde(m, layers=str(layer), layer_mean=False)
+                              TDE(m, layers=str(layer), layer_mean=False)
                                 )
-        print(f'==============>{m}, all layers...<==============')
+        print(f'==============>evaluating {m}, all layers...<==============')
         eval_embedding_L2(train_data, 
-                        tde(m, layers='all', layer_mean=True)
-)
+                        TDE(m, layers='all', layer_mean=True))
+
+
+def test_model(model):
+    print(f'Testing {model.base_model_name}')
+    eval_embedding_L2(test_data, model)
 
 if __name__ == "__main__":
+    # test_model(TDE('sentence-transformers/all-MiniLM-L6-v2'))
     dev_pipeline()
     # eval_embedding_L2(train_data, embedder)
     # import numpy as np
     # # init embedding
-    # embedding = tde('sentence-transformers/all-MiniLM-L6-v2')
+    # embedding = TDE('sentence-transformers/all-MiniLM-L6-v2')
     # print(
     #     embedding.base_model_name
     # )

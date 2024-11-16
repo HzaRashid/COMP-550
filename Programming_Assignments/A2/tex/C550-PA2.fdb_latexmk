@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1731720991.97384 "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" "C550-PA2.pdf" "C550-PA2" 1731720992.56002 0
-  "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" 1731720991.63882 5823 748d63db542015a89310a5ed6044bb2c ""
+["pdflatex"] 1731740372.92048 "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" "C550-PA2.pdf" "C550-PA2" 1731740373.42237 0
+  "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" 1731740372.71423 7138 82db51f91905b39fae8f482c0736d307 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -84,9 +84,9 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1726687478 5498206 6c0f03cb370063b7ddbd563e5f9ce23a ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1726687597 3326097 67d158ddf1124cb5acae0cccb2750d58 ""
   "/usr/local/texlive/2024/texmf.cnf" 1726687468.2814 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "C550-PA2.aux" 1731720992.50621 2000 7702ea71bc73af4490fb42ad80a4bb0e "pdflatex"
-  "C550-PA2.out" 1731720992.50661 2195 6baeccd542fa22a8506f39f80a87d1cf "pdflatex"
-  "C550-PA2.tex" 1731720991.63882 5823 748d63db542015a89310a5ed6044bb2c ""
+  "C550-PA2.aux" 1731740373.37046 2000 f967eb40df5bd15f1265979f7e6cadd1 "pdflatex"
+  "C550-PA2.out" 1731740373.37086 2195 6baeccd542fa22a8506f39f80a87d1cf "pdflatex"
+  "C550-PA2.tex" 1731740372.71423 7138 82db51f91905b39fae8f482c0736d307 ""
   (generated)
   "C550-PA2.aux"
   "C550-PA2.log"
