@@ -1,6 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[margin=0.5in]{geometry}
+\usepackage[margin=0.4in]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -17,68 +17,101 @@
 remember to compare the accuracies
 
 Word Sense Disambiguation (WSD) is the task of determining the correct sense of a word in context. 
-In this assignment, Lesk’s algorithm and other methods were implemented to resolve word senses 
-in the SemEval 2013 Shared Task \#12 dataset, using WordNet v3.0 as the lexical resource. 
+In this assignment, \texttt{Most Frequent Sense (MFS)} and \texttt{Lesk’s algorithm} are tested as baselines, and we present
+two additional methods using pre-trained language models: \texttt{Named Entity Overlap (NEO)} and \texttt{Transformer embeddings L2 distances (TeL2d)}.
+As per assignment instructions, we used the SemEval 2013 Shared Task \#12 dataset, 
+using WordNet v3.0 as the lexical resource. 
 This report presents the methodology, results, and analysis of these experiments.
+Due to the small size of our dataset 
+and its specialized contents, the following results will not necessarily hold in a general setting.
 
 \section{Methods}
 \subsection{Baseline Methods}
-For Most Frequent Sense (MFS), we utilized NLTK's \texttt{wordnet.synsets()} method, choosing the synset whose sum of 
+For MFS, we utilized NLTK's \texttt{wordnet.synsets()} method, choosing the synset whose sum of 
 lemma frequencies was the largest. This method yielded $55.93\%$ accuracy on the test set that was provided. 
 Preprocessing considerations included lowercase conversion and underscore removal when dealing with multi-word phrases,
 the former decreasing the accuracy, and the latter being necessary for all methods in this assignment. 
+Keeping with the baseline treatment, we did not supplement this method with part of speech tagging.
 Moving on to Lesk, its use of token level comparisons led to various preprocessing experiments on the dev set: stopword removal, puncuation removal, and lowercase conversion. 
-Since the dataset was biased toward international politics, we saw a performance decrease with lowercase conversion. Punctuation removal 
+Since the dataset was biased towards politics and economics, we saw a performance decrease with lowercase conversion. Punctuation removal 
 slightly increased the accuracy, which could owe to NLTK's \texttt{word\_tokenizer} seperating 
 punctuation from the adjacent word, leaving more opportunity for unwanted overlap. 
-Similarly, stopword removal improved the accuracy, trading quantity for more meaningful overlap. 
+Similarly, stopword removal improved the accuracy, trading quantity for more meaningful overlap.
 In the end, Lesk's best accuracy of $30.41\%$ was acheived with stopword and punctuation removal,
-and case retention. The relatively poor performance is likely caused by the specialized dataset.
+and case retention. The relatively poor performance is likely caused by the specialized dataset. 
+
 
 \subsection{Custom Methods}
-\subsubsection{Method 1: Named Entity Overlap (NEO)}
-% Explain the use of a pretrained language model (e.g., BERT) for WSD, including how contextual embeddings were utilized to resolve word senses.
+\subsubsection{Method 1: NEO}
 For NEO, we perform a variant of Lesk, computing overlap between the named entities of 
-the context and the synset example text or definition (when no example exists).
+both the context and the synset example text or definition (when no example exists). 
+Our hypothesis is that Lesk misses meaningful overlap due to the presence of 
+synonyms (of the context words) in the synset text, and that the use of named entities can resolve this oversight.
 Our intuition is that an example is likelier to contain meaningful entities to be compared against,
 which proved to be effective on the dev set. Notable challenges in 
 this method include: sparsity of entities in both the synset texts 
 (resorting to the definition when an example was not available) and the sequence-labeling models' tag sets. 
 As a result, we experimented with various models varying in size, speed, and number of tags. 
-The latter addresses the sparsity directly, while the former two explore the tradeoffs between speed and accuracy. 
-The pre-trained models were based on the BiLSTM-CRF sequence-labeling architecture proposed in 
+The pre-trained models were based on the BiLSTM-CRF (IOB) sequence-labeling architecture proposed in 
 \textit{``Contextual String Embeddings for Sequence Labeling"}, 
 by Akbik, Blythe, and Vollgraf (2018), namely: \texttt{Flair English 4-class NER} and \texttt{Flair English 18-class NER}.
-We evaluated the \texttt{base} and \texttt{fast} variants of the former, and the \texttt{large} and \texttt{fast} variants of the latter on the dev set, 
-getting the best results with the 18-class fast model. The 4-class model predicts tags \texttt{PER, LOC, ORG, and MISC}---person, location, organization, and other, respectively. 
+We evaluated the \texttt{base} and \texttt{fast} variants of the former, and the \texttt{large} 
+and \texttt{fast} variants of the latter on the dev set. We got the  
+best results with the 18-class fast model, scoring $63.40\%$. This likely owes to the model
+reducing sparsity, but not being too accurate and causing unwanted overlap. The 4-class model predicts tags \texttt{PER, LOC, ORG, and MISC}---person, location, organization, and other, respectively. 
 In addition to the 4-class tags, the 18-class model predicts some tags that are relevant to our task, such as \texttt{GPE} (geo-political entities) and \texttt{NORP} (nationalities or 
-religious or political groups). This reduces sparsity in the dataset's tags, making it easier to resolve the names of domain specific phrases. On the other hand,
+religious or political groups). This reduces sparsity in the dataset's tags, making it easier to resolve the sense of a domain specific phrase. On the other hand,
 general purpose words that are collocated with domain specific phrases are often harder to resolve since
-the definition and example text will rarely use political terms.
-
-\subsubsection{Method 2: Transformer embeddings L2 distances (TeL2d)}
+its definition and example texts will rarely use political terms.
+18-class test acc: 57.793103448275865\%
+\subsubsection{Method 2: TeL2d}
 % Describe the design and implementation of the second method, highlighting its uniqueness compared to the first method.
-Our hypothesis is that a transformer's contextualized embeddings 
-% ability to encode both syntactic and semantic information
-can be used to accurately identify the sense of a word, given its context and synsets'
-examples (if they exist) or definition. We use a pre-trained transformer
+For this method, we use a pre-trained transformer
 model to generate document embeddings, and select the synset whose example text 
-embedding minimizes L2 distance with the context embedding. 
-This method continues in spirit of NEO, attempting to generalize Lesk to account for implicit similarities. 
-There are a considerable number of synsets for which an example text does not exist, 
-in which case, we use the definition. We experimented with the same preprocessing decisions 
-as in the Lesk method, as well as model selection and hyperparameter tuning on the dev set.
-Punctuation and stopword removal had adverse effect on accuracy, meaning that 
-higher quality embeddings depended on textual richness. It is then reasonable 
-to postulate that the underlying dataset's lemmatization is not an ideal preprocessing decision
-in this setting. For the purposes of the assignment, we left the dataset unchanged.
+embedding minimizes L2 distance with the context's embedding. As this method is less 
+intuitive, we provide sample output (of python pseudocode) below:
+\begin{verbatim}
+    # disambiguate golden_retriever
+    context = flair.Sentence("a distinguished gentleman and golden_retriever named Marshall")
+    definition = flair.Sentence("an English breed having a long silky golden coat")
+    bert_embedder.embed(context), bert_embedder.embed(definition)
+    L2_dist = numpy.linalg.norm(context.embedding - definition.embedding)
+    print(L2_dist) # want to find the example/definition minimizing this
+    >>> 5.690494
+    \end{verbatim}
+\vspace{-3ex}
+Our hypothesis is that a transformer's contextualized embeddings capture
+sufficient semantic information to map a sentence close to the gold synset's
+text for each of its words, at least in a subspace of the model's representational space.
+This method continues in spirit of NEO, attempting to generalize Lesk 
+to account for implicit similarities. Since we are working with large pre-trained 
+models, we expect them to be able to implicity encode entities and other latent information
+that could be useful for our task. In addition to the preprocessing considerations from the previous methods, 
+we did model selection and hyperparameter tuning on the dev set.
+Punctuation and stopword removal had an adverse effect on accuracy, meaning that 
+higher quality embeddings required textual richness. 
+Thus, the underlying dataset's lemmatization was not ideal, but 
+for the purposes of the assignment, we left it unchanged. 
+On the dev set, we evaluated the accuracy of each layer of the following models: 
+\texttt{bert-base-cased (12 layers), all-mpnet-base-v2 (12), and all-MiniLM-L6-v2 (6)}. 
+Treating BERT as a baseline, we found that the cased version outperformed the uncased one, 
+which is consistent with the preprocessing experimentation. \texttt{All-mpnet-base-v2} and \texttt{all-MiniLM-L6-v2} 
+are both fine tuned on a 1B sentence pairs dataset, using contrastive learning objective: 
+given a sentence from the pair, the model should predict which out of a set of randomly sampled other sentences, 
+was actually paired with it. As this pre-training task is adjacent to ours, these models seemed promising.
+On the dev set, the most accurate model was \texttt{all-MiniLM-L6-v2}, with its $6^{th}$ layer scoring $51.03$\%,
+and falling shortly behind the approach where we take the mean of all layers to compute the L2 distance, scoring $51.54\%$.
 
-representations depends on the surrounding textual richness, at least in the task of WSD. 
-We compared three transformers varying in both in size and pre-training task.
+% representations depends on the surrounding textual richness, at least in the task of WSD. 
+% We compared three transformers varying in both in size and pre-training task.
 
-indicates that textual richness improves perhaps owing to the dependence of
-This leads one to believe that without the underlying dataset's lemmatization, this method would have performed better. 
+% indicates that textual richness improves perhaps owing to the dependence of
+% This leads one to believe that without the underlying dataset's lemmatization, this method would have performed better. 
 \section{Experimental Setup}
+We used the dataset split provided in the starter code for development and testing. The
+baselines were implemented with NLTK's tokenizer, stopword corpus, Lesk method, and wordnet synsets. 
+These resources (except for the Lesk implementation) are also used in the custom methods for preprocessing
+and model evaluation (looking up synsets).
 \subsection{Dataset}
 Explain the use of the SemEval 2013 Shared Task \#12 dataset, including handling multi-word expressions and the separation of dev and test sets.
 
@@ -104,7 +137,11 @@ Summarize the findings and highlight the key takeaways from the experiments.
 \section*{References}
 \begin{itemize}
     \item Navigli, R., \& Jurgens, D. (2013). SemEval-2013 Task 12: Multilingual Word Sense Disambiguation. \emph{Proceedings of the 7th International Workshop on Semantic Evaluation}.
+    \item Akbik, A., Blythe, D., \& Vollgraf, R. (2018). Contextual String Embeddings for Sequence Labeling. \emph{Proceedings of the 27th International Conference on Computational Linguistics}, 1638--1649.
     \item WordNet Documentation: \url{https://wordnet.princeton.edu/documentation/senseidx5wn}
+    \item Hugging Face: Sentence-Transformers Model \texttt{all-mpnet-base-v2}. Retrieved from \url{https://huggingface.co/sentence-transformers/all-mpnet-base-v2}.
+    \item Hugging Face: Sentence-Transformers Model \texttt{all-MiniLM-L6-v2}. Retrieved from \url{https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2}.
+    \item Flair NLP:  \url{https://flairnlp.github.io/docs/intro}.
 \end{itemize}
 
 \end{document}

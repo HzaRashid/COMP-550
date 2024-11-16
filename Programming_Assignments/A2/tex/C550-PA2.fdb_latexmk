@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1731740372.92048 "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" "C550-PA2.pdf" "C550-PA2" 1731740373.42237 0
-  "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" 1731740372.71423 7138 82db51f91905b39fae8f482c0736d307 ""
+["pdflatex"] 1731800871.40238 "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" "C550-PA2.pdf" "C550-PA2" 1731800872.03197 0
+  "/Users/hamzarashid/Desktop/comp550/Programming_Assignments/A2/tex/C550-PA2.tex" 1731800871.17933 10059 3c8a0fbea23fb1b0a4916fb58ea11e08 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -26,6 +26,7 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb" 1248133631 34811 78b52f49e893bcba91bd7581cdc144c0 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1248133631 32080 340ef9bf63678554ee606688e7b5339d ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb" 1248133631 35469 70d41d2b9ea31d5d813066df7c99281c ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb" 1248133631 32722 d7379af29a190c3f453aba36302ff5a9 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb" 1248133631 32362 179c33bbf43f19adbb3825bb4e36e57a ""
@@ -84,9 +85,9 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1726687478 5498206 6c0f03cb370063b7ddbd563e5f9ce23a ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1726687597 3326097 67d158ddf1124cb5acae0cccb2750d58 ""
   "/usr/local/texlive/2024/texmf.cnf" 1726687468.2814 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "C550-PA2.aux" 1731740373.37046 2000 f967eb40df5bd15f1265979f7e6cadd1 "pdflatex"
-  "C550-PA2.out" 1731740373.37086 2195 6baeccd542fa22a8506f39f80a87d1cf "pdflatex"
-  "C550-PA2.tex" 1731740372.71423 7138 82db51f91905b39fae8f482c0736d307 ""
+  "C550-PA2.aux" 1731800871.9721 1939 837c100593d29d9c76d96c54b711e5c7 "pdflatex"
+  "C550-PA2.out" 1731800871.97276 1857 c843d12d7ea7717e285d663e19b8994c "pdflatex"
+  "C550-PA2.tex" 1731800871.17933 10059 3c8a0fbea23fb1b0a4916fb58ea11e08 ""
   (generated)
   "C550-PA2.aux"
   "C550-PA2.log"

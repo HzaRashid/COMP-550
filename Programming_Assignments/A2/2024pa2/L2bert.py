@@ -20,7 +20,7 @@ data = pd.read_csv(
 
 train_data = data[data['id'].str.startswith('d001')]
 test_data = data[~data['id'].str.startswith('d001')]
-tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
+# tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
 
 ''' model evaluation '''
 def eval_embedding_L2(data, embedder):
@@ -32,21 +32,20 @@ def eval_embedding_L2(data, embedder):
     cur_sent = [None, None] # document-id, context-embedding
     
     for _, item in data.iterrows():
-        s = item.id.split('.')[1]
-        if s != cur_sent[0]:
+        s = item.id.split('.')[1] # document-id
+        if s != cur_sent[0]: # new document
             cur_sent[0] = s
-            sent = Sentence(item.context.replace('_', ' '))
-            
-            # cur_sent[1] = Sentence(item.context.replace('_', ' '))
-            # embedder.embed(cur_sent[1])
-
-           
-            word_embedder = TWE(embedder.base_model_name)
-            word_embedder.embed(sent)
-            for token in sent:
-                if token.text != item.lemma: continue
-                cur_sent[1] = token
-                break
+            cur_sent[1] = Sentence(item.context.replace('_', ' '))
+            embedder.embed(cur_sent[1])
+            # # the code below extracts the token embedding for the target lemma
+            # # (the models perform worse with this)
+            # sent = Sentence(item.context.replace('_', ' '))
+            # word_embedder = TWE(embedder.base_model_name)
+            # word_embedder.embed(sent)
+            # for token in sent:
+            #     if token.text != item.lemma: continue
+            #     cur_sent[1] = token
+            #     break
                 # print(token.embedding)
 
         synsets = wn.synsets(item.lemma)
@@ -73,8 +72,8 @@ def eval_embedding_L2(data, embedder):
 
 def dev_pipeline(models={
     'bert-base-cased': 12, # number of layers
-    # 'sentence-transformers/all-mpnet-base-v2': 12,
-    # 'sentence-transformers/all-MiniLM-L6-v2': 6
+    'sentence-transformers/all-mpnet-base-v2': 12,
+    'sentence-transformers/all-MiniLM-L6-v2': 6
     }):
 
     for m in models:
@@ -86,66 +85,13 @@ def dev_pipeline(models={
         print(f'==============>evaluating {m}, all layers...<==============')
         eval_embedding_L2(train_data, 
                         TDE(m, layers='all', layer_mean=True))
-
+        print('\n')
 
 def test_model(model):
-    print(f'Testing {model.base_model_name}')
+    print(f'Testing {model.base_model_name}...')
     eval_embedding_L2(test_data, model)
 
 if __name__ == "__main__":
-    # test_model(TDE('sentence-transformers/all-MiniLM-L6-v2'))
-    dev_pipeline()
-    # eval_embedding_L2(train_data, embedder)
-    # import numpy as np
-    # # init embedding
-    # embedding = TDE('sentence-transformers/all-MiniLM-L6-v2')
-    # print(
-    #     embedding.base_model_name
-    # )
-
-    # # create a sentence
-    # sentence1 = Sentence('hello from here')
-    # sentence2 = Sentence('goodbye from there')
-    # embedding.embed(sentence1)
-    # embedding.embed(sentence2)
-
-    # print(sentence1.embedding == sentence2.embedding)
-
-    # for s in (sentence1, sentence2):
-    #     print(s.embedding)
-    #     print(len(s.embedding))
-    #     print(type(s.embedding))
-
-    # print(
-    #     np.linalg.norm(sentence1.embedding - sentence2.embedding)
-    # )
-
-
-    # embed words in sentence
-    # embedding.embed(sentence)
-    # now check out the embedded tokens.
-    # for token in sentence:
-    #     print(token)
-    #     print(len(token.embedding))
-    #     print(token.embedding)
-
-    # # Example text
-    # sample_text = "The quick brown fox jumps over the lazy dog"
-
-    # # Find all parts of speech in above sentence
-    # tagged = [('', x[1]) for x in pos_tag(word_tokenize(sample_text))]
-
-    # # Extract all parts of speech from any text
-    # chunker = RegexpParser("""
-    #                     NP: {<DT>?<JJ>*<NN>} #To extract Noun Phrases
-    #                     P: {<IN>}			 #To extract Prepositions
-    #                     V: {<V.*>}			 #To extract Verbs
-    #                     PP: {<p> <NP>}		 #To extract Prepositional Phrases
-    #                     VP: {<V> <NP|PP>*}	 #To extract Verb Phrases
-    #                     """)
-
-    # # Print all parts of speech in above sentence
-    # output = chunker.parse(tagged)
-
-    # print("After Extracting\n", output)
-    # print('', str(output))
+    test_model(TDE('sentence-transformers/all-MiniLM-L6-v2'))
+    # dev_pipeline()
+    pass

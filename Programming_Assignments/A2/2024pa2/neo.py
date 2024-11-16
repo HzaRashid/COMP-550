@@ -1,15 +1,11 @@
 '''IMPORT'''
-# from nltk.tokenize import RegexpTokenizer
-# from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
-from flair.nn import Classifier
 from flair.data import Sentence
+from flair.nn import Classifier
 from ast import literal_eval
 import pandas as pd
 import random 
 import os
-# stop_words = set(stopwords.words('english'))
-# tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
 
 
 ''' load data '''
@@ -95,7 +91,7 @@ def get_max_NEO_synset(context, synsets):
 
 
 def dev_pipeline(models=[
-    'ner-fast', 
+    # 'ner-fast', 
     # 'ner', 
     # 'ner-ontonotes-large',
     'ner-ontonotes-fast']):
@@ -103,6 +99,7 @@ def dev_pipeline(models=[
     for model in models:
         print(f'==============>evaluating {model}...<==============')
         eval_NEO(data=train_data, seq_tagger=Classifier.load(model), st_name=model)
+        print('\n')
 
 def test_model(model):
     print(f'==============>testing {model}...<==============')
@@ -110,9 +107,7 @@ def test_model(model):
 
     
 if __name__ == "__main__":
-    test_model('ner-ontonotes-fast')
-    # dev_pipeline()
-    # print(Classifier.load('ner-fast'))
-    # eval_NEO(train_data, Classifier.load('ner-fast'))
+    # test_model('ner-ontonotes-fast')
+    dev_pipeline()
     # eval_first_sense(test_data)
 
