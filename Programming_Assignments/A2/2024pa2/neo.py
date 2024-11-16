@@ -13,7 +13,7 @@ import random
 
 
 ''' Flair NER model '''
-NERtagger = Classifier.load('ner-fast')
+# NERtagger = Classifier.load('ner-ontonotes-large')
 
 ''' load data '''
 data = pd.read_csv(
@@ -25,23 +25,23 @@ data = pd.read_csv(
 train_data = data[data['id'].str.startswith('d001')]
 
 ''' MODELS '''
-def eval_NEO(data):
+def eval_NEO(data, seq_tagger, st_name):
     # Named Entity Overlap
     correct_prediction_ct = 0
-    cur_sent = [None, None]
+    cur_sent = [None, None] # document-id, Named-Entities set
     for _, item in data.iterrows():
         item_lemma = item.lemma
         s = item.id.split('.')[1]
         if s != cur_sent[0]:
             cur_sent[0] = s
-            cur_sent[1] = get_NE_tags(item.context.replace('_', ' '))
+            cur_sent[1] = get_NE_tags(item.context.replace('_', ' '), seq_tagger)
 
         synsets = wn.synsets(item_lemma)
         # gather definition and examples
         tagged_synsets = [
-            (synset, get_NE_tags(synset.definition())) \
+            (synset, get_NE_tags(synset.definition(), seq_tagger)) \
             if not synset.examples() else \
-            (synset, get_NE_tags(random.choice(synset.examples())))
+            (synset, get_NE_tags(random.choice(synset.examples()), seq_tagger))
             for synset in synsets
             ]
         
@@ -55,11 +55,11 @@ def eval_NEO(data):
         if sense in item.label:
             correct_prediction_ct += 1
 
-    print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
+    print(f'{st_name} Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
 # pick first synset every time
-def eval_baseline(data):
+def eval_first_sense(data):
     # Named Entity Overlap
     correct_prediction_ct = 0
     for _, item in data.iterrows():
@@ -76,14 +76,14 @@ def eval_baseline(data):
         if sense in item.label:
             correct_prediction_ct += 1
 
-    print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
+    print(f'first sense Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
 ''' HELPERS '''
-def get_NE_tags(sentence):
+def get_NE_tags(sentence, seq_tagger):
     # run NER over sentence
     sentence = Sentence(sentence)
-    NERtagger.predict(sentence)
+    seq_tagger.predict(sentence)
     return [label.value for label in sentence.get_labels()]
 
 def overlap_quantity(context1, context2):
@@ -98,6 +98,19 @@ def get_max_NEO_synset(context, synsets):
     ], key=lambda x: x[1])
 
 
+
+def dev_pipeline(models=[
+    'ner-fast', 
+    'ner', 
+    'ner-large',
+    'ner-ontonotes-large']):
+    for model in models:
+        print(f'==============>{model}...<==============')
+        eval_NEO(data=train_data, seq_tagger=Classifier.load(model), st_name=model)
+
 if __name__ == "__main__":
-    eval_NEO(train_data)
+    dev_pipeline()
+    # print(Classifier.load('ner-fast'))
+    # eval_NEO(train_data, Classifier.load('ner-fast'))
+    # eval_baseline(train_data)
 

@@ -1,11 +1,14 @@
 '''IMPORT'''
-import os
+from flair.embeddings import TransformerDocumentEmbeddings as tde
+from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet as wn
+from nltk.corpus import stopwords
 from flair.data import Sentence
-from flair.embeddings import TransformerDocumentEmbeddings
-import pandas as pd
 from ast import literal_eval
+import pandas as pd
 import numpy as np
+import os
+
 
 ''' load data '''
 data = pd.read_csv(
@@ -15,37 +18,32 @@ data = pd.read_csv(
     )
 
 train_data = data[data['id'].str.startswith('d001')]
+tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
 
-''' get pre-trained model for embeddings'''
-embedding = TransformerDocumentEmbeddings('bert-base-uncased')
-
-
-def eval_L2_bert(data):
+def eval_embedding_L2(data, embedder):
     ''' 
-    L2 distance between context and 
-    synset example (if available) or definition 
-    embeddings
+    L2 distance between transformer embeddings
+    of context and synset example (if available) or definition text
     '''
     correct_prediction_ct = 0
-    cur_sent = [None, None]
+    cur_sent = [None, None] # document-id, context-embedding
     
     for _, item in data.iterrows():
         s = item.id.split('.')[1]
         if s != cur_sent[0]:
-            print(s)
             cur_sent[0] = s
-            cur_sent[1] = Sentence(item.context)
-            embedding.embed(cur_sent[1])
+            cur_sent[1] = Sentence(item.context.replace('_', ' '))
+            embedder.embed(cur_sent[1])
 
         synsets = wn.synsets(item.lemma)
         tagged_synsets = []
         for ss in synsets:
             ss_text = Sentence(ss.examples()[0] if ss.examples() else ss.definition())
-            embedding.embed(ss_text)
+            embedder.embed(ss_text)
             tagged_synsets.append(
                 (ss, np.linalg.norm(cur_sent[1].embedding - ss_text.embedding))
                 )
-        
+        # print(tagged_synsets)
         sense = None
         closest_ss = min(tagged_synsets, key=lambda x: x[1])[0]
 
@@ -56,28 +54,49 @@ def eval_L2_bert(data):
         if sense in item.label:
             correct_prediction_ct += 1
 
-    print(f'Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
+    print(f'{embedder.base_model_name} Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
 
+def dev_pipeline(models={
+    # 'bert-base-cased': 12, # number of layers
+    'sentence-transformers/all-mpnet-base-v2': 12,
+    'sentence-transformers/all-MiniLM-L6-v2': 6
+    }):
+
+    for m in models:
+        for layer in range(1, models[m] + 1):
+            print(f'==============>{m}, layer {layer}...<==============')
+            eval_embedding_L2(train_data, 
+                              tde(m, layers=str(layer), layer_mean=False)
+                                )
+        print(f'==============>{m}, all layers...<==============')
+        eval_embedding_L2(train_data, 
+                        tde(m, layers='all', layer_mean=True)
+)
 
 if __name__ == "__main__":
-    eval_L2_bert(train_data)
+    dev_pipeline()
+    # eval_embedding_L2(train_data, embedder)
     # import numpy as np
     # # init embedding
-    # embedding = TransformerDocumentEmbeddings('bert-base-uncased')
+    # embedding = tde('sentence-transformers/all-MiniLM-L6-v2')
+    # print(
+    #     embedding.base_model_name
+    # )
 
     # # create a sentence
     # sentence1 = Sentence('hello from here')
-    # sentence2 = Sentence('hello from here')
+    # sentence2 = Sentence('goodbye from there')
     # embedding.embed(sentence1)
     # embedding.embed(sentence2)
 
+    # print(sentence1.embedding == sentence2.embedding)
 
-    # print(sentence1.embedding)
-    # print(sentence1.embedding)
-    # print(len(sentence1.embedding))
-    # print(type(sentence1.embedding))
+    # for s in (sentence1, sentence2):
+    #     print(s.embedding)
+    #     print(len(s.embedding))
+    #     print(type(s.embedding))
 
     # print(
     #     np.linalg.norm(sentence1.embedding - sentence2.embedding)

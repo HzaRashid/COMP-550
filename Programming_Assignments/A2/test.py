@@ -5,7 +5,7 @@ from flair.nn import Classifier
 sentence = Sentence('a motor vehicle with four wheels; usually propelled by an internal combustion engine.')
 
 # load the NER tagger
-tagger = Classifier.load('ner-fast')
+tagger = Classifier.load('ner-ontonotes-large')
 
 # run NER over sentence
 tagger.predict(sentence)

@@ -10,7 +10,7 @@ from loader import main_data_loader
 # #
 from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk 
-from nltk.tokenize import RegexpTokenizer
+from nltk.tokenize import RegexpTokenizer, word_tokenize
 from nltk.corpus import stopwords
 # from nltk.stem import WordNetLemmatizer
 
@@ -18,6 +18,7 @@ from nltk.corpus import stopwords
 dev_data, test_data, dev_key, test_key = main_data_loader()
 stop_words = set(stopwords.words('english'))
 tokenize = RegexpTokenizer(r'\w+').tokenize # removes punctuation
+# tokenize = word_tokenize
 # lemmatize = WordNetLemmatizer().lemmatize
 
 ''' Baseline Models '''
@@ -77,8 +78,8 @@ def eval_mfs(data, keys):
 
 
 if __name__ == "__main__":
-    eval_mfs(test_data, test_key)
-    # eval_lesk(test_data, test_key)
+    # eval_mfs(test_data, test_key)
+    eval_lesk(test_data, test_key)
 
     # x = 'North_America'
     # for synset in wn.synsets(x):
