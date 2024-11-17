@@ -1,3 +1,14 @@
+'''******************************************************************'''
+'''******************************************************************'''
+'''
+INSTRUCTIONS:
+    -  Scroll to the bottom (__name__ == "__main__")
+    -  run test_model(model) with the model thats already there
+    
+'''
+'''******************************************************************'''
+'''******************************************************************'''
+
 '''IMPORT'''
 from flair.embeddings import TransformerDocumentEmbeddings as TDE
 from flair.embeddings import TransformerWordEmbeddings as TWE
@@ -56,7 +67,7 @@ def eval_embedding_L2(data, embedder):
             tagged_synsets.append(
                 (ss, np.linalg.norm(cur_sent[1].embedding - ss_text.embedding))
                 )
-        # print(tagged_synsets)
+            
         sense = None
         closest_ss = min(tagged_synsets, key=lambda x: x[1])[0]
 
@@ -70,6 +81,7 @@ def eval_embedding_L2(data, embedder):
     print(f'{embedder.base_model_name} Accuracy: {100 * float(correct_prediction_ct / len(data))}%')
 
 
+''' Dev and Test '''
 def dev_pipeline(models={
     'bert-base-cased': 12, # number of layers
     'sentence-transformers/all-mpnet-base-v2': 12,
@@ -92,6 +104,6 @@ def test_model(model):
     eval_embedding_L2(test_data, model)
 
 if __name__ == "__main__":
-    test_model(TDE('sentence-transformers/all-MiniLM-L6-v2'))
-    # dev_pipeline()
-    pass
+    model_name = 'sentence-transformers/all-MiniLM-L6-v2'
+    model = TDE(model_name)
+    test_model(model) # be patient

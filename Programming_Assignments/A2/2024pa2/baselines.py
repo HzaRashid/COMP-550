@@ -1,3 +1,18 @@
+'''******************************************************************'''
+'''******************************************************************'''
+'''
+INSTRUCTIONS:
+    -   This file contains the baseline model implementations.
+    -   Scroll to the bottom (__name__ == "__main__")
+    -   Run eval_lesk() or eval_mfs() or both
+
+    -   For The CUSTOM methods:
+            -> Go to: neo.py     (method 1)
+            -> Go to: L2bert.py  (method 2)
+        further instructions are provided there!
+'''
+'''******************************************************************'''
+'''******************************************************************'''
 '''IMPORT'''
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import wordnet as wn
@@ -68,11 +83,11 @@ def preprocess(text):
                map(lambda x: x.decode('ascii'), text)
                )).replace('_', ' '))
 
+
 if __name__ == "__main__":
     eval_lesk(test_data, test_key)
     eval_mfs(test_data, test_key)
     
-
 
     '''
     the following code was used 
@@ -87,14 +102,3 @@ if __name__ == "__main__":
     nltk.download('punkt_tab', download_dir=download_dir)
     #
     '''
-
-    # x = 'North_America'
-    # for synset in wn.synsets(x):
-        # print(synset, synset.definition())
-        # print([lemma.name() for lemma in synset.lemmas()])
-
-    # for synset in wn.synsets('car'):
-    #     print(synset, synset.definition())
-
-    #     for lemma in synset.lemmas():
-    #         print(lemma, lemma.hypernyms())

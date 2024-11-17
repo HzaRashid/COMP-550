@@ -1,3 +1,13 @@
+'''******************************************************************'''
+'''******************************************************************'''
+'''
+INSTRUCTIONS:
+    -  Scroll to the bottom (__name__ == "__main__")
+    -  run test_model(model_name) with the model_name thats already there
+    
+'''
+'''******************************************************************'''
+'''******************************************************************'''
 '''IMPORT'''
 from nltk.corpus import wordnet as wn
 from flair.data import Sentence
@@ -90,10 +100,11 @@ def get_max_NEO_synset(context, synsets):
     ], key=lambda x: x[1])
 
 
+''' Dev and Test '''
 def dev_pipeline(models=[
-    # 'ner-fast', 
-    # 'ner', 
-    # 'ner-ontonotes-large',
+    'ner-fast', 
+    'ner', 
+    'ner-ontonotes-large',
     'ner-ontonotes-fast']):
     # evaluate models on training set
     for model in models:
@@ -101,13 +112,13 @@ def dev_pipeline(models=[
         eval_NEO(data=train_data, seq_tagger=Classifier.load(model), st_name=model)
         print('\n')
 
+
 def test_model(model):
     print(f'==============>testing {model}...<==============')
     eval_NEO(data=test_data, seq_tagger=Classifier.load(model), st_name=model)
 
     
 if __name__ == "__main__":
-    # test_model('ner-ontonotes-fast')
-    dev_pipeline()
-    # eval_first_sense(test_data)
+    model_name = 'ner-ontonotes-fast'
+    test_model(model_name) # be patient
 
