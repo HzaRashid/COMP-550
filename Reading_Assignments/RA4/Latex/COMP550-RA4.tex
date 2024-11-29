@@ -5,7 +5,7 @@
 \usepackage{geometry}
 \geometry{a4paper, margin=0.35in}
 \usepackage{titling}
-\setlength{\droptitle}{-2.5cm}
+\setlength{\droptitle}{-3.5cm}
 \title{ }
 \author{ Reading Assignment 4 \\ Hamza Rashid, 260971031 \\ COMP 550, Fall 2024}
 \date{}
@@ -20,8 +20,8 @@ the authors focus on gender bias with respect to occupations,
 evaluating the accuracy of Rule-based, Statisical, and Neural 
 Coreference Systems in resolving a pronoun (male, female, or neutral) 
 to a coreferent antecedent that is either an occupation or a participant. 
-They constructed a challenge dataset, Winogender schemas, 
-in the style of Winograd schemas, wherein a pronoun must be resolved to one of two previously mentioned 
+They constructed a challenge dataset, \textit{Winogender schemas}, 
+in the style of \textit{Winograd schemas}, wherein a pronoun must be resolved to one of two previously mentioned 
 entities in a sentence. The authors followed good practice 
 by validating their hand-crafted dataset on Amazon's Mechanical Turk (MTurk) with 10-way
 redunancy, with 94.9\% of responses agreeing with their intended answers. This shows that
@@ -65,29 +65,30 @@ The paper discussed a potential case of bias amplification involving the occupat
 “manager” in the B\&L resource are only 5.18\%, yet no managers 
 were predicted to be female by any of the coreference systems.
 The mechanism in which dataset bias could be amplified at the system level depends on the system;
-a Rule-based system is susceptible to the biases of the human designer and the resulting hand-crafted rules,
+a Rule-based system is susceptible to the biases of the expert-knowledge of its human designer,
 a Statistical system is vulnerable to the biases of a feature function associating an occupation with a gender,
-and a Neural system's pre-trained embeddings is prone to capturing latent biases between occupations and genders
-due to the biases in its pre-training data. System-level bias can
-lead to further amplification in society as the market for consumer chat-based LLM's continues to grow. For example,
+and a Neural system's pre-trained embeddings is prone to encoding latent biases from its pre-training data. In all three cases, gender bias is introduced into the system as an unintended consequence of improving
+its performance. The resulting system-level bias can
+lead to further amplification in society as human-ai interaction continues to grow, causing a cycle of bias. For example,
 the integration of Gemini in Google search is prone to gender bias in queries such as "most impactful computer scientists", 
 where the contributions of Ada Lovelace are likely to be overlooked in comparison with Alan Turing.
 
-For many occupations, the tested systems strongly prefer to resolve pronouns
-of one gender over another. The paper demonstrates that
-this preferential behavior correlates both with real world employment statistics and the text statistics
-that these systems use.  They posited that these systems overgeneralize the attribute of gender, 
-leading them to make errors that humans do not make. The authors developed a simple and effective way to 
-measure the degree of gender bias in the tested models. However, they note the limitations of
-Winogender schemas, viewing them as having high positive predictive value and low negative predictive
-value. In other words, the schemas may demonstrate the presence
-of gender bias in a system, but not prove its absence. This follows from their dataset's focus on occupation
-bias, as the models may be good at coreference resolution in this setting, but exhibit gender
-bias in different topics.
+The paper demonstrates that the preferential behavior in pronoun-occupation resolution exhibited 
+by all the systems correlates both with real world employment statistics and the text statistics
+that these systems use. However, they note the limitations of
+{Winogender schemas}, viewing them as having high positive predictive value and low negative predictive
+value. This follows from their dataset's focus on occupation
+bias; the models may be good at coreference resolution in this setting, but exhibit gender
+bias in different topics. The Winogender schemas
+revealed varying degrees of gender bias in all three
+systems. In particular, 68\% of male-female minimal pair 
+test sentences are resolved differently by the Rule-based 
+system; 28\% for Statistical; and 13\% for Neural. And overall, male pronouns were more likely to
+be resolved to the occupation antecedent than female or neutral pronouns across all systems.
 
 In conclusion, the paper presents precise schemas for measuring the presence of gender bias in a CRS. Their dataset
 has gone through rigorous validation through crowdsourcing, and they use appropriate data (BLS and B\&L) 
-to compare these systems' biases with. The authors do no explore or inquire the generalizability of these results across more models, and there is no discussion 
+to compare these systems' biases with; they are all of North American origin. The authors do no explore or inquire the generalizability of these results across more models, and there is no discussion 
 on the importance of using an evaluation dataset whose national origins are the same as that of the models being evaluated. 
 This is critical due to the varying degrees of gender bias across nations. Furthermore, there is no discussion of how the training method and national origin 
 of training corpora for the CRS models impacts their gender bias in coreference resolution. In the end, the authors 
