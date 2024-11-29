@@ -3,6 +3,7 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{geometry}
+\usepackage{hyperref}
 \geometry{a4paper, margin=0.35in}
 \usepackage{titling}
 \setlength{\droptitle}{-3.5cm}
@@ -27,19 +28,14 @@ by validating their hand-crafted dataset on Amazon's Mechanical Turk (MTurk) wit
 redunancy, with 94.9\% of responses agreeing with their intended answers. This shows that
 the authors designed test sentences where correct pronoun resolution is not a function of gender. However,
 they do not report on their MTurk workers' approval ratings or method for selecting them 
-(e.g., qualification tests). With the Winogender schemas in hand, an unbiased model is expected to
-exhibit no sensitivity to pronoun gender in its accuracy, and to resolve a male or female 
-pronoun to an occupation or participant with equal likelihood. 
-% Furthermore, their proposed dataset is small and biased towards North American labor statistics,
-% consisting of 720 sentences covering 60 occupations with corresponding gender percentages
-% available from the U.S. Bureau of Labor Statistics (BLS). 
-
-% There is no discussion of how their evaluation dataset 
-% impacts their analysis depending on the national origin of the CRS models, or how the training method and national origin 
-% of training corpora for the CRS models impacts their gender bias in coreference resolution. For example,
-% in Burkina Faso, the majority of managerial positions are held by women, and thus a model that is
-% trained or constructed with data from this nation might exhibit opposite behaviour than what was observed in the paper regarding 
-% managerial positions in the United States.
+(e.g., qualification tests). They measure gender bias in coreference resolution systems by 
+varying only the pronoun's gender and examining the impact of this change on resolution (revealing cases where coreference
+systems may be more or less likely to recognize a pronoun as coreferent with a particular occupation
+based on pronoun gender). An unbiased model is expected to exhibit no sensitivity to pronoun gender in its resolution accuracy, resolving a male or female 
+pronoun to an occupation or participant with equal likelihood. They correlate this bias with
+real-world and textual gender statistics. The models tested were:
+the Stanford multi-pass sieve system (Lee et al., 2011; Rule-based), Durrett and Klein's (2013) statistical system, 
+and the Clark and Manning (2016a) deep reinforcement system (neural).
 
 To construct the dataset, the authors 
 used a list of 60 one-word occupations obtained from Caliskan et al. (2017), 
@@ -53,33 +49,36 @@ participant, e.g., “the passenger,” and a generic
 paricipant, “someone.”). Thus, the resulting evaluation set contains 720 sentences: 60 occupations × 2 sentence templates per
 occupation × 2 participants × 3 pronoun genders.
 
-A key observation is that when each CRS's predictions diverge based
-on pronoun gender, they do so in ways that reinforce and magnify real-world 
+When each CRS's predictions diverge based
+on pronoun gender, they do so in ways that resemble real-world 
 occupational gender disparities. As shown in figure 4 of the paper, the systems' gender
 preferences for occupations correlate with BLS
-and the gender statistics from text (Bergsma and Lin, 2006), which these systems access directly. 
-A notable case is “gotcha” sentences in which pronoun gender does not match the occupation's 
-majority gender (BLS) if the occupation is the correct answer; all models perfomed worse in this scenario. 
-The paper discussed a potential case of bias amplification involving the occupation manager: 
-38.5\% female in the U.S. according to BLS, and mentions of
+and the gender statistics from text (Bergsma and Lin, 2006; B\&L), which these systems access directly. 
+All models perfomed worse in “gotcha” sentences, in which pronoun gender does not match the 
+majority gender (BLS) of the occupation (correct answer).
+The paper discussed potential bias amplification involving the occupation manager: 
+38.5\% female according to BLS, and mentions of
 “manager” in the B\&L resource are only 5.18\%, yet no managers 
-were predicted to be female by any of the coreference systems.
-The mechanism in which dataset bias could be amplified at the system level depends on the system;
-a Rule-based system is susceptible to the biases of the expert-knowledge of its human designer,
-a Statistical system is vulnerable to the biases of a feature function associating an occupation with a gender,
-and a Neural system's pre-trained embeddings is prone to encoding latent biases from its pre-training data. In all three cases, gender bias is introduced into the system as an unintended consequence of improving
-its performance. The resulting system-level bias can
-lead to further amplification in society as human-ai interaction continues to grow, causing a cycle of bias. For example,
-the integration of Gemini in Google search is prone to gender bias in queries such as "most impactful computer scientists", 
-where the contributions of Ada Lovelace are likely to be overlooked in comparison with Alan Turing.
+were predicted to be female by any of the coreference systems (percentage-wise differences in real-world
+statistics may translate into absolute differences
+in system predictions).
+% If unchecked, dataset bias could amplify at the system level.
+A Rule-based system may amplify the biases of its hand-crafted rules (which may amplify biases the dataset(s) and external resources),
+a Statistical system is vulnerable to the bias of a feature function associating an occupation with a pronoun (which can be informative, yet biased, for
+occupations occuring less frequently in the data),
+and a Neural system's pre-trained embeddings is prone to encoding latent biases from its pre-training data. 
+Gender bias is often introduced into the system as an unintended consequence of task-specific model construction or
+or training. System-level biases can lead to further amplification in society through human-A.I interaction, causing a cycle of bias. 
+% For example,
+% the integration of Gemini in Google search is prone to gender bias in queries such as "most impactful computer scientists", 
+% where the contributions of Ada Lovelace are likely to be overlooked in comparison with Alan Turing.
 
-The paper demonstrates that the preferential behavior in pronoun-occupation resolution exhibited 
-by all the systems correlates both with real world employment statistics and the text statistics
-that these systems use. However, they note the limitations of
-{Winogender schemas}, viewing them as having high positive predictive value and low negative predictive
-value. This follows from their dataset's focus on occupation
-bias; the models may be good at coreference resolution in this setting, but exhibit gender
-bias in different topics. The Winogender schemas
+The bias exhibited by all three systems correlates both with real world employment statistics and the text statistics
+that these systems use. The authors note that while having have high positive predictive value, the 
+Winogender schemas have low negative predictive
+value. This follows from the dataset's focus on gender bias in occupations; 
+the models may be good at coreference resolution in this setting, but exhibit gender
+bias in different topics (e.g., crime data across genders). The Winogender schemas
 revealed varying degrees of gender bias in all three
 systems. In particular, 68\% of male-female minimal pair 
 test sentences are resolved differently by the Rule-based 
@@ -103,12 +102,26 @@ may be extended broadly to probe for other manifestations of gender bias.
 % their proposed dataset is small and biased towards North American labor statistics,
 % and there is no discussion 
 
+% Furthermore, their proposed dataset is small and biased towards North American labor statistics,
+% consisting of 720 sentences covering 60 occupations with corresponding gender percentages
+% available from the U.S. Bureau of Labor Statistics (BLS). 
+
+% There is no discussion of how their evaluation dataset 
+% impacts their analysis depending on the national origin of the CRS models, or how the training method and national origin 
+% of training corpora for the CRS models impacts their gender bias in coreference resolution. For example,
+% in Burkina Faso, the majority of managerial positions are held by women, and thus a model that is
+% trained or constructed with data from this nation might exhibit opposite behaviour than what was observed in the paper regarding 
+% managerial positions in the United States.
+
 \section*{References} 
 \begin{itemize}
     \item Rachel Rudinger, Jason Naradowsky, Brian Leonard, and Benjamin Van Durme. 2018. Gender Bias in Coreference Resolution. In \textit{Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 2 (Short Papers)}, pages 8–14, New Orleans, Louisiana. Association for Computational Linguistics.
     \item Aylin Caliskan, Joanna J. Bryson, and Arvind Narayanan. 2017. In \textit{Semantics derived automatically from language corpora contain human-like biases. Science}, 356(6334):183–186.
-    \item Shane Bergsma and Dekang Lin. 2006. Bootstrapping
-    path-based pronoun resolution. In \textit{Proceedings of the 21st International Conference on Computational Linguistics and 44th Annual Meeting of the Association for Computational Linguistics}, pages 33–40, Sydney, Australia. Association for Computational Linguistics.
-    \item https://rshiny.ilo.org/dataexplorer39/?lang=en\&id=SDG\_T552\_NOC\_RT\_A
+    \item Shane Bergsma and Dekang Lin. 2006. Bootstrapping path-based pronoun resolution. In \textit{Proceedings of the 21st International Conference on Computational Linguistics and 44th Annual Meeting of the Association for Computational Linguistics}, pages 33–40, Sydney, Australia. Association for Computational Linguistics.
+    \item Heeyoung Lee, Yves Peirsman, Angel Chang, Nathanael Chambers, Mihai Surdeanu, and Dan Jurafsky. 2011. Stanford’s multi-pass sieve coreference resolution system at the conll-2011 shared task. In \textit{Conference on Natural Language Learning (CoNLL) Shared Task}.
+    \item Greg Durrett and Dan Klein. 2013. Easy victories and uphill battles in coreference resolution. In \textit{Proceedings of the Conference on Empirical Methods in Natural Language Processing, Seattle, Washington. Association for Computational Linguistics}.
+    \item Kevin Clark and Christopher D. Manning. 2016a.Deep reinforcement learning for mention-ranking coreference models. In \textit{Empirical Methods on Natural Language Processing (EMNLP)}.
+    % \item https://rshiny.ilo.org/dataexplorer39/?lang=en\&id=SDG\_T552\_NOC\_RT\_A
+    \item Crime data. \url{https://www.ussc.gov/research/quick-facts/individuals-federal-bureau-prisons#:~:text=Individual%20and%20Offense%20Characteristics,93.0%25%20are%20men.}
 \end{itemize}
 \end{document}
