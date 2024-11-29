@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1732907812.97057 "/Users/hamzarashid/Desktop/comp550/Reading_Assignments/RA4/Latex/COMP550-RA4.tex" "COMP550-RA4.pdf" "COMP550-RA4" 1732907813.47634 0
-  "/Users/hamzarashid/Desktop/comp550/Reading_Assignments/RA4/Latex/COMP550-RA4.tex" 1732907812.76356 10127 85de9af399f7f68b67edecd9f669ce3f ""
+["pdflatex"] 1732913062.7152 "/Users/hamzarashid/Desktop/comp550/Reading_Assignments/RA4/Latex/COMP550-RA4.tex" "COMP550-RA4.pdf" "COMP550-RA4" 1732913063.23209 0
+  "/Users/hamzarashid/Desktop/comp550/Reading_Assignments/RA4/Latex/COMP550-RA4.tex" 1732913062.47923 8197 d57d5dde83f2c84d7b64b8cbecd119fc ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -81,9 +81,9 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1726687478 5498206 6c0f03cb370063b7ddbd563e5f9ce23a ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1726687597 3326097 67d158ddf1124cb5acae0cccb2750d58 ""
   "/usr/local/texlive/2024/texmf.cnf" 1726687468.2814 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "COMP550-RA4.aux" 1732907813.42925 162 87159b23cce7c2b923b11c85495bbd6d "pdflatex"
-  "COMP550-RA4.out" 1732907813.27515 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "COMP550-RA4.tex" 1732907812.76356 10127 85de9af399f7f68b67edecd9f669ce3f ""
+  "COMP550-RA4.aux" 1732913063.18525 162 87159b23cce7c2b923b11c85495bbd6d "pdflatex"
+  "COMP550-RA4.out" 1732913063.02864 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "COMP550-RA4.tex" 1732913062.47923 8197 d57d5dde83f2c84d7b64b8cbecd119fc ""
   (generated)
   "COMP550-RA4.aux"
   "COMP550-RA4.log"
